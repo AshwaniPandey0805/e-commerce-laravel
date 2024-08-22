@@ -1,8 +1,13 @@
 <?php
 
 use App\Http\Controllers\admin\AdminLoginController;
+use App\Http\Controllers\admin\CategoryController;
 use App\Http\Controllers\admin\HomeController;
+
+use Illuminate\Support\Facades\Redis;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,8 +35,27 @@ Route::group(['prefix' => 'admin'], function(){
     });
 
     Route::group(['middleware' => 'admin.auth'], function(){
+        Route::get('/category/list', [CategoryController::class, 'index'])->name('category.index');
         Route::get('/dashboard', [HomeController::class, 'index'])->name('admin.dashboard');
         Route::get('/logout', [HomeController::class, 'logout'])->name('admin.logout');
+
+        // Create Category
+        Route::get('/category/create', [CategoryController::class, 'create'])->name('categories.create');
+        Route::post('/category/store', [CategoryController::class, 'store'])->name('categories.store');
+
+        
+        Route::get('/getSlug', function(Request $request) {
+            $slug = '';
+            if (!empty($request->query('title'))) {
+                $slug = Str::slug($request->query('title'));
+            }
+
+            return response()->json([
+                'slug' => $slug
+            ]);
+        })->name('get.slug');
+
+        
     });
     
 

@@ -11,6 +11,7 @@
 		<!-- Theme style -->
 		<link rel="stylesheet" href="{{ asset('admin-assets/css/adminlte.min.css') }}">
 		<link rel="stylesheet" href="{{ asset('admin-assets/css/custom.css') }}">
+		<meta name="csrf-token" content="{{ csrf_token() }}" >
 	</head>
 	<body class="hold-transition sidebar-mini">
 		<!-- Site wrapper -->
@@ -61,27 +62,43 @@
 			<!-- /.navbar -->
 			@include('layouts.sidebar')
 			<!-- Content Wrapper. Contains page content -->
-			@yield('content')
+			<div class="content-wrapper">
+				@yield('content')
+			</div>
 			<!-- /.content-wrapper -->
+			<footer class="main-footer">
+				<strong>Copyright &copy; 2024-2025 AmazingShop All rights reserved.
+			</footer>
 			
 			
 		</div>
 		<!-- ./wrapper -->
 		<!-- jQuery -->
 		{{-- <script src="{{ asset('admin-assets/plugins/jquery/jquery.min.js') }}"></script> --}}
-		<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-		<!-- Bootstrap 4 -->
-		<!-- Bootstrap CSS -->
-        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+		<!-- jQuery (full version) -->
+		<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 
-        <!-- Bootstrap JS -->
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+		<!-- Bootstrap 4 -->
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+		<!-- Bootstrap CSS -->
+		<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
 		<!-- AdminLTE App -->
 		<script src="{{ asset('admin-assets/js/adminlte.min.js') }}"></script>
+
 		<!-- AdminLTE for demo purposes -->
 		<script src="{{ asset('admin-assets/js/demo.js') }}"></script>
+
+		<script type="text/javascript">
+			$.ajaxSetup({
+				headers: {
+					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+				}
+			});
+		</script>
+
+		@yield('customeJS')
        
 	</body>
 </html>
