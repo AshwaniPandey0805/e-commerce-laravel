@@ -37,6 +37,17 @@
                                     <input type="text" readonly name="slug" id="slug" class="form-control" placeholder="Slug">
                                     <p></p>	
                                 </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                        <input type="text" id="image_id" name="image_id" >
+                                        <label for="image">Image</label>
+                                        <div id="image" class="dropzone dz-clickable">
+                                            <div class="dz-message needsclick">    
+                                                <br>Drop files here or click to upload.<br><br>                                            
+                                            </div>
+                                        </div>
+                                </div>
                             </div>									
                             <div class="col-md-6">
                                 <div class="mb-3">
@@ -76,7 +87,7 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')  // Include CSRF token
             },
             success: function(response) {
-
+                console.log(response);
                 if( response['status'] == true ){
 
                     window.location.href = "{{ route('category.index')}}"
@@ -147,6 +158,30 @@
             }
         });
     });
+
+    Dropzone.autoDiscover = false;    
+    const dropzone = $("#image").dropzone({ 
+        init: function() {
+            this.on('addedfile', function(file) {
+                if (this.files.length > 1) {
+                    this.removeFile(this.files[0]);
+                }
+            });
+        },
+        url:  "{{ route('categories.image.upload') }}",
+        maxFiles: 1,
+        paramName: 'image',
+        addRemoveLinks: true,
+        acceptedFiles: "image/jpeg,image/png,image/gif",
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }, success: function(file, response){
+            $("#image_id").val(response.image_id);
+            //console.log(response)
+        }
+    });
+
+    
     
     </script>
 @endsection
