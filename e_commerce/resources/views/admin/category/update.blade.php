@@ -1,20 +1,13 @@
 
 @extends('layouts.app')
 @section('content')
-    @if (session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        {{ session('success') }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    @endif
+
     <!-- Content Header (Page header) -->
     <section class="content-header">					
         <div class="container-fluid my-2">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Create Category</h1>
+                    <h1>Update Category</h1>
                 </div>
                 <div class="col-sm-6 text-right">
                     <a href="{{ route('category.index') }}" class="btn btn-primary">Back</a>
@@ -34,20 +27,20 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="name">Name</label>
-                                    <input type="text" name="name" id="name" class="form-control" placeholder="Name">
+                                    <input type="text" name="name" value="{{ $category->name }}" id="name" class="form-control" placeholder="Name">
                                     <p></p>	
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="slug">Slug</label>
-                                    <input type="text" readonly name="slug" id="slug" class="form-control" placeholder="Slug">
+                                    <input type="text" readonly name="slug"  id="slug" value="{{ $category->slug }}" class="form-control" placeholder="Slug">
                                     <p></p>	
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                        <input type="hidden"  id="image_id" name="image_id" >
+                                        <input type="hidden" id="image_id" name="image_id" >
                                         <label for="image">Image</label>
                                         <div id="image" class="dropzone dz-clickable">
                                             <div class="dz-message needsclick">    
@@ -55,13 +48,28 @@
                                             </div>
                                         </div>
                                 </div>
-                            </div>									
+                                @if (!empty($category->image))
+                                    <div class="d-flex flex-column align-items-center justify-content-center my-3">
+                                        <div class="card shadow-lg" style="width: 150px;">
+                                            <img 
+                                                src="{{ asset('uploads/category/thumb/'.$category->image) }}" 
+                                                alt="category-image" 
+                                                class="card-img-top rounded-lg img-fluid"
+                                                style="height: 150px; object-fit: cover;"
+                                            >
+                                            
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                            
+                            									
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="status">Slug</label>
                                     <select name="status" id="status" class="form-control">
-                                        <option value="1">Active</option>
-                                        <option value="0">Block</option>
+                                        <option {{ $category->status == 1 ? 'selected' : '' }}  value="1">Active</option>
+                                        <option {{ $category->status == 0 ? 'selected' : '' }}  value="0">Block</option>
                                     </select>
                                 </div>
                             </div>									
@@ -69,7 +77,7 @@
                     </div>							
                 </div>
                 <div class="pb-5 pt-3">
-                    <button type="submit" class="btn btn-primary">Create</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
                     <a href="#" class="btn btn-outline-dark ml-3">Cancel</a>
                 </div>
             </form>
@@ -86,8 +94,8 @@
         console.log('clicked');
 
         $.ajax({
-            url: "{{ route('categories.store') }}",  // Corrected with quotes
-            type: 'POST',
+            url: "{{ route('categories.update', $category->id) }}",  // Corrected with quotes
+            type: 'PUT',
             data: element.serialize(),  // Using serialize() for form data
             dataType: 'json',  // Corrected dataType
             headers: {
@@ -104,6 +112,11 @@
                     $('#slug').removeClass('is-invalid').siblings('p').removeClass('invalid-feedback').html();
 
                 } else {
+                    console.log("ddsdsdsd")
+                    if(response['notFound'] ==  true){
+
+                        window.location.href = "{{ route('category.index')}}"
+                    }
                     var errors = response['errors'];
 
                     if( errors['name'] ) {
