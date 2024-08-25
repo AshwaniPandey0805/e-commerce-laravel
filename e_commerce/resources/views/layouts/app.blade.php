@@ -12,6 +12,7 @@
 		<!-- Theme style -->
 		<link rel="stylesheet" href="{{ asset('admin-assets/css/adminlte.min.css') }}">
 		<link rel="stylesheet" href="{{ asset('admin-assets/css/custom.css') }}">
+		<link rel="stylesheet" href="{{ asset('admin-assets/plugins/summernote/summernote.min.css') }}">
 		<meta name="csrf-token" content="{{ csrf_token() }}" >
 	</head>
 	<body class="hold-transition sidebar-mini">
@@ -78,26 +79,30 @@
 		{{-- <script src="{{ asset('admin-assets/plugins/jquery/jquery.min.js') }}"></script> --}}
 		<!-- jQuery (full version) -->
 		<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-
 		<!-- Bootstrap 4 -->
 		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-
 		<!-- Bootstrap CSS -->
 		<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-
 		<!-- AdminLTE App -->
 		<script src="{{ asset('admin-assets/js/adminlte.min.js') }}"></script>
-
 		<!-- AdminLTE for demo purposes -->
 		<script src="{{ asset('admin-assets/js/demo.js') }}"></script>
 		{{-- include dropzone min.js file --}}
 		<script src="{{ asset('admin-assets/plugins/dropzone/min/dropzone.min.js') }}"></script>
+		<script src="{{ asset('admin-assets/plugins/summernote/summernote.min.js') }}"></script>
 		<script type="text/javascript">
 			$.ajaxSetup({
 				headers: {
 					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 				}
 			});
+
+			$(document).ready(function(){
+				$('.summernote').summernote({
+					height : 250
+				});
+			});
+
 		</script>
 
 		@yield('customeJS')

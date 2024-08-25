@@ -4,8 +4,10 @@ use App\Http\Controllers\admin\AdminLoginController;
 use App\Http\Controllers\admin\BrandController;
 use App\Http\Controllers\admin\CategoryController;
 use App\Http\Controllers\admin\HomeController;
+use App\Http\Controllers\admin\ProductController;
 use App\Http\Controllers\admin\SubCategoryController;
 use App\Http\Controllers\admin\TemImageController;
+use App\Http\Controllers\ProductSubCategoryController;
 use App\Models\TempImage;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Http\Request;
@@ -73,13 +75,21 @@ Route::group(['prefix' => 'admin'], function(){
 
 
         // Create Band Route
-        Route::get('/brand/list',[BrandController::class, 'index'])->name('brand.index');
-        Route::get('/brand/create',[BrandController::class, 'create'])->name('brand.create');
-        Route::post('/brand/store',[BrandController::class, 'store' ])->name('brand.store');
-        Route::any('/brand/{id}/edit',[BrandController::class, 'edit' ])->name('brand.edit');
-        Route::put('/brand/{id}/update',[BrandController::class, 'update' ])->name('brand.update');
-        Route::any('/brand/{id}/delete',[BrandController::class, 'destory' ])->name('brand.delete');
+        Route::get('/brand/list',        [BrandController::class, 'index'   ])->name('brand.index');
+        Route::get('/brand/create',      [BrandController::class, 'create'  ])->name('brand.create');
+        Route::post('/brand/store',      [BrandController::class, 'store'   ])->name('brand.store');
+        Route::any('/brand/{id}/edit',   [BrandController::class, 'edit'    ])->name('brand.edit');
+        Route::put('/brand/{id}/update', [BrandController::class, 'update'  ])->name('brand.update');
+        Route::any('/brand/{id}/delete', [BrandController::class, 'destory' ])->name('brand.delete');
+
+
+        //Create Product Routes
+        Route::get('/product/create',[ProductController::class,'create'])->name('product.create');
+        Route::post('/product/store',[ProductController::class,'store'])->name('product.store');
         
+
+        // Get Sub Category data
+        Route::post('/product/sub-category',[ProductSubCategoryController::class, 'getSubCategory'])->name('product.SubCategory');
     });
     
 
