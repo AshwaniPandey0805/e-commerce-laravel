@@ -8,6 +8,7 @@ use App\Http\Controllers\admin\ProductController;
 use App\Http\Controllers\admin\ProductImageController;
 use App\Http\Controllers\admin\SubCategoryController;
 use App\Http\Controllers\admin\TemImageController;
+use App\Http\Controllers\FrontController;
 use App\Http\Controllers\ProductSubCategoryController;
 use App\Models\TempImage;
 use Illuminate\Support\Facades\Redis;
@@ -26,9 +27,10 @@ use Illuminate\Support\Str;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+Route::get('/',[FrontController::class,'index'])->name('front.index');
 
 
 
