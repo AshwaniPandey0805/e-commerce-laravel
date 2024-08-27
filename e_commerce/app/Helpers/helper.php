@@ -1,0 +1,3 @@
+<?php 
+    // publuc function getSubc
+?>

@@ -90,6 +90,13 @@
                         </select>
                         <p></p>
                      </div>
+                     <div class="mb-3">
+                        <label for="show_home">Show On Home</label>
+                        <select name="show_home" id="show_home" class="form-control">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
                   </div>									
                </div>							
             </div>

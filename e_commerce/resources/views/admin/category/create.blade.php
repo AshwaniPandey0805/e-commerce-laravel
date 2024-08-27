@@ -58,13 +58,21 @@
                             </div>									
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="status">Slug</label>
+                                    <label for="status">Activate Slug</label>
                                     <select name="status" id="status" class="form-control">
                                         <option value="1">Active</option>
                                         <option value="0">Block</option>
                                     </select>
                                 </div>
+                                <div class="mb-3">
+                                    <label for="show_home">Show On Home</label>
+                                    <select name="show_home" id="show_home" class="form-control">
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                </div>
                             </div>									
+                            									
                         </div>
                     </div>							
                 </div>
