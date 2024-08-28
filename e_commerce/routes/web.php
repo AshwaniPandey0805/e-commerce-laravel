@@ -10,6 +10,7 @@ use App\Http\Controllers\admin\SubCategoryController;
 use App\Http\Controllers\admin\TemImageController;
 use App\Http\Controllers\FrontController;
 use App\Http\Controllers\ProductSubCategoryController;
+use App\Http\Controllers\ShopController;
 use App\Models\TempImage;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Http\Request;
@@ -31,6 +32,7 @@ use Illuminate\Support\Str;
 //     return view('welcome');
 // });
 Route::get('/',[FrontController::class,'index'])->name('front.index');
+Route::get('/shop',[ShopController::class,'index'])->name('shop.index');
 
 
 
