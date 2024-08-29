@@ -32,7 +32,7 @@ use Illuminate\Support\Str;
 //     return view('welcome');
 // });
 Route::get('/',[FrontController::class,'index'])->name('front.index');
-Route::get('/shop',[ShopController::class,'index'])->name('shop.index');
+Route::get('/shop/{categorySlug?}/{subcategorySlug?}', [ShopController::class, 'index'])->name('shop.index');
 
 
 

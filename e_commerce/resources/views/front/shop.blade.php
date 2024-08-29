@@ -25,23 +25,27 @@
                             @if ($categories->isNotEmpty())
                                 @foreach ($categories as $key => $category)
                                     <div class="accordion-item">
-                                        <h2 class="accordion-header" id="headingOne">
-                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne-{{ $key }}" aria-expanded="false" aria-controls="collapseOne-{{ $key }}">
-                                                {{ $category->name }}
-                                            </button>
-                                        </h2>
                                         @if ($category->getSubCategories->isNotEmpty())
-                                            <div id="collapseOne-{{ $key }}" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample" style="">
+                                            <h2 class="accordion-header" id="headingOne">
+                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne-{{ $key }}" aria-expanded="false" aria-controls="collapseOne-{{ $key }}">
+                                                    {{ $category->name }}
+                                                </button>
+                                            </h2>    
+                                        @else
+                                            {{-- @dd($category->slug) <!-- Debugging line, you might want to remove this in production --> --}}
+                                            <a href="{{ route('shop.index', $category->slug) }}" class="nav-item nav-link {{ ($categorySelected == $category->id) ? 'text-primary' : '' }} ">{{ $category->name }}</a>
+                                        @endif
+                                        @if ($category->getSubCategories->isNotEmpty())
+                                            <div id="collapseOne-{{ $key }}" class="accordion-collapse collapse {{ ($categorySelected == $category->id) ? 'show' : '' }}" aria-labelledby="headingOne" data-bs-parent="#accordionExample" style="">
                                                 <div class="accordion-body">
                                                     <div class="navbar-nav">
                                                         @foreach ($category->getSubCategories as $subCategory)
-                                                            <a href="" class="nav-item nav-link">{{ $subCategory->name }}</a>    
+                                                            <a href="{{ route('shop.index', [$category->slug, $subCategory->slug]) }}" class="nav-item nav-link {{ ($subCategorySelected == $subCategory->id) ? 'text-primary' : '' }} ">{{ $subCategory->name }}</a>    
                                                         @endforeach                                           
                                                     </div>
                                                 </div>
                                             </div>    
                                         @endif
-                                        
                                     </div>        
                                 @endforeach
                             @endif                        
@@ -57,8 +61,8 @@
                         @if ($brands->isNotEmpty())
                             @foreach ($brands as $brand)
                                 <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                                    <label class="form-check-label" for="flexCheckDefault">
+                                    <input {{ in_array( $brand->id , $brandArray ) ? 'checked' : "" }}  class="form-check-input brand-label" type="checkbox" name="brand[]" value="{{ $brand->id }}" id="brand-{{ $brand->id }}">
+                                    <label class="form-check-label" for="brand-{{ $brand->id }}">
                                         {{ $brand->name }}
                                     </label>
                                 </div>        
@@ -74,10 +78,7 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" name="brand[]" value="{{ $brand->id }}"  id="brand-{{ $brand->id }}">
-                            <label class="form-check-label" for="flexCheckDefault">
-                                $0-$100
-                            </label>
+                            <input type="text" class="js-range-slider" name="my_range" value="" >
                         </div>                 
                     </div>
                 </div>
@@ -88,12 +89,11 @@
                         <div class="d-flex align-items-center justify-content-end mb-4">
                             <div class="ml-2">
                                 <div class="btn-group">
-                                    <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-bs-toggle="dropdown">Sorting</button>
-                                    <div class="dropdown-menu dropdown-menu-right">
-                                        <a class="dropdown-item" href="#">Latest</a>
-                                        <a class="dropdown-item" href="#">Price High</a>
-                                        <a class="dropdown-item" href="#">Price Low</a>
-                                    </div>
+                                    <select name="sort" id="sort" class="form-control">
+                                        <option value="latest" {{ ($sort == 'latest' ? 'selected' : '') }} >Latest</option>
+                                        <option value="price_desc" {{ ($sort == 'price_desc' ? 'selected' : '') }} >High Price</option>
+                                        <option value="price_asc" {{ ($sort == 'price_asc' ? 'selected' : '') }} >Low Price</option>
+                                    </select>
                                 </div>                                    
                             </div>
                         </div>
@@ -110,7 +110,11 @@
                             <div class="col-md-4">
                                 <div class="card product-card">
                                     <div class="product-image position-relative">
-                                        <a href="" class="product-img"><img class="card-img-top" src="{{ asset('uploads/products/small/'.$productImage) }}" alt=""></a>
+                                        @if (!empty($productImage))
+                                            <a href="" class="product-img"><img class="card-img-top" src="{{ asset('uploads/products/small/'.$productImage) }}" alt=""></a>
+                                        @else
+                                            <a href="" class="product-img"><img class="card-img-top" src="{{ asset('admin-assets/img/default-150x150.png') }}" alt=""></a>
+                                        @endif
                                         <a class="whishlist" href="222"><i class="far fa-heart"></i></a>                            
         
                                         <div class="product-action">
@@ -130,9 +134,10 @@
                             </div>
                         @endforeach
                     @endif  
-                    <div class="col-md-12 pt-5">
+                        <div class="col-md-12 pt-5">
                         <nav aria-label="Page navigation example">
-                            <ul class="pagination justify-content-end">
+                            {{ $products->withQueryString()->links() }}
+                            {{-- <ul class="pagination justify-content-end">
                                 <li class="page-item disabled">
                                 <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
                                 </li>
@@ -142,7 +147,7 @@
                                 <li class="page-item">
                                 <a class="page-link" href="#">Next</a>
                                 </li>
-                            </ul>
+                            </ul> --}}
                         </nav>
                     </div>
                 </div>
@@ -150,4 +155,54 @@
         </div>
     </div>
 </section>
+@endsection
+@section('customJs')
+    <script>
+        $('.brand-label').change(function(){
+            appyFilter();
+        });
+
+        rangeSlider = $(".js-range-slider").ionRangeSlider({
+            type: "double",
+            min: 0,
+            max: 10000, 
+            from: {{ $price_min }},
+            step : 10,
+            to:   {{ $price_max }},
+            skin : "round",
+            max_postfix : "+",
+            prefix : "$",
+            onFinish : function () {
+                appyFilter();
+            }
+        });
+
+        var slider = $(".js-range-slider").data('ionRangeSlider');
+
+        $('#sort').change(function(){
+            appyFilter();
+        })
+
+        function appyFilter(){
+            var brands = [];
+            $('.brand-label').each(function(){
+                if($(this).is(":checked") == true){
+                    brands.push($(this).val());
+                }
+            });
+
+            // Price Range
+            var url = "{{ url()->current() }}?";
+            url += '&price_min='+slider.result.from+'&price_max='+slider.result.to;
+
+            if(brands.lenght > 0){
+                url += '&brands='+brands.toString()
+            }
+
+            // Sorting
+            url += '&sort='+$('#sort').val();
+
+            window.location.href = url ;
+        }
+    </script>
 @endsection

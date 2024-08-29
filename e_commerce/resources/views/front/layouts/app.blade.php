@@ -35,6 +35,7 @@
 	<link rel="stylesheet" type="text/css" href="{{ asset('front-assets/css/slick-theme.css') }}" />
 	<link rel="stylesheet" type="text/css" href="{{ asset('front-assets/css/video-js.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ asset('front-assets/css/style.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ asset('front-assets/css/ion.rangeSlider.min.css') }}" />
 
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
@@ -95,7 +96,7 @@
                             </button>
                             <ul class="dropdown-menu dropdown-menu-dark">
                             @foreach ($category->getSubCategories as $subCategory)
-                                <li><a class="dropdown-item nav-link" href="#">{{ $subCategory->name }}</a></li>
+                                <li><a class="dropdown-item nav-link" href="{{ route('shop.index', [ $category->slug, $subCategory->slug ]) }}">{{ $subCategory->name }}</a></li>
                             @endforeach
                             </ul>    
                         </li>        
@@ -169,6 +170,7 @@
 <script src="{{ asset('front-assets/js/instantpages.5.1.0.min.js') }}"></script>
 <script src="{{ asset('front-assets/js/lazyload.17.6.0.min.js') }}"></script>
 <script src="{{ asset('front-assets/js/slick.min.js') }}"></script>
+<script src="{{ asset('front-assets/js/ion.rangeSlider.min.js') }}"></script>
 <script src="{{ asset('front-assets/js/custom.js') }}"></script>
 <script>
 window.onscroll = function() {myFunction()};
@@ -184,6 +186,7 @@ function myFunction() {
   }
 }
 </script>
+	@yield('customJs')
 </body>
 </html>
 
