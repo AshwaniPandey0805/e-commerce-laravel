@@ -13,6 +13,7 @@
 		<link rel="stylesheet" href="{{ asset('admin-assets/css/adminlte.min.css') }}">
 		<link rel="stylesheet" href="{{ asset('admin-assets/css/custom.css') }}">
 		<link rel="stylesheet" href="{{ asset('admin-assets/plugins/summernote/summernote.min.css') }}">
+		<link rel="stylesheet" href="{{ asset('admin-assets/plugins/select2/css/select2.min.css') }}">
 		<meta name="csrf-token" content="{{ csrf_token() }}" >
 	</head>
 	<body class="hold-transition sidebar-mini">
@@ -90,6 +91,7 @@
 		{{-- include dropzone min.js file --}}
 		<script src="{{ asset('admin-assets/plugins/dropzone/min/dropzone.min.js') }}"></script>
 		<script src="{{ asset('admin-assets/plugins/summernote/summernote.min.js') }}"></script>
+		<script src="{{ asset('admin-assets/plugins/select2/js/select2.full.min.js') }}"></script>
 		<script type="text/javascript">
 			$.ajaxSetup({
 				headers: {

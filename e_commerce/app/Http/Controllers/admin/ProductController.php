@@ -72,7 +72,7 @@ class ProductController extends Controller
             $product->is_featured = $request->is_featured;
             $product->short_description = $request->short_description;
             $product->shipping_return = $request->shipping_return;
-            $product->related_products = $request->related_products;
+            $product->related_products = (!empty($request->related_products)) ? implode(',',$request->related_products) : '';
             $product->save();
 
             //Save Gallery Pics
@@ -135,6 +135,13 @@ class ProductController extends Controller
         $productImages = ProductImage::where('product_id', $product->id)->get();
         // dd($productImages);
         // dd($subcategories);
+
+        $relatedProducts = [];
+        if($product->related_products != ''){
+            $productArray = explode(',', $product->related_products);
+            $relatedProducts = Product::whereIn('id', $productArray)->get();
+        }
+
         $categories = Category::orderBy('name', "ASC")->get();
         $brands = Brands::all();
         $data['categories'] = $categories;
@@ -142,6 +149,7 @@ class ProductController extends Controller
         $data['subCategories'] = $subCategories;
         $data['product'] = $product;
         $data['productImages'] = $productImages; 
+        $data['relatedProducts'] = $relatedProducts; 
         return view('admin.product.edit',$data);
     }
 
@@ -190,7 +198,7 @@ class ProductController extends Controller
             $product->is_featured = $request->is_featured;
             $product->short_description = $request->short_description;
             $product->shipping_return = $request->shipping_return;
-            $product->related_products = $request->related_products;
+            $product->related_products = (!empty($request->related_products)) ? implode(',',$request->related_products) : '';
             $product->save();
 
             //Save Gallery Pics
@@ -269,5 +277,24 @@ class ProductController extends Controller
         $product->delete();
         $request->session()->flash('success', 'Product deleted successfully');
         return redirect()->route('product.index')->with('success','Product deleted successfully');
+    }
+
+    public function getProducts(Request $request){
+        $tempProduct = [];
+        if($request->term != ''){
+            $products = Product::where('title', 'like', '%'.$request->term.'%')->with('product_images')->get();
+
+            if($products != null){
+                foreach ($products as $key => $product) {
+                    $tempProduct[] = array( 'id' => $product->id, 'text' => $product->title ); 
+                }
+            }
+        }
+
+        return response()->json([
+            'tags' => $tempProduct,
+            'status' => true
+        ]);
+
     }
 }

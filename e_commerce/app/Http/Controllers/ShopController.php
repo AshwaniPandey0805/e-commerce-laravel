@@ -86,7 +86,13 @@ class ShopController extends Controller
         if($product == null){
             abort(404);
         }
+        if(!empty($product->related_products)){
+            $relatedProductArray = explode(',' , $product->related_products);
+            $relatedProducts = Product::whereIn('id', $relatedProductArray)->with('product_images')->get();
+        }
+        
         $data['product'] = $product;
+        $data['relatedProducts'] = $relatedProducts;
         return view('front.product' ,$data );
     }
 }

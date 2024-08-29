@@ -96,6 +96,7 @@ Route::group(['prefix' => 'admin'], function(){
         Route::any('/product/{id}/edit',[ProductController::class,'edit'])->name('product.edit');
         Route::put('/product/{id}/update',[ProductController::class,'update'])->name('product.update');
         Route::any('/product/{id}/delete',[ProductController::class,'delete'])->name('product.delete');
+        Route::get('/product/related-product', [ProductController::class, 'getProducts'])->name('product.getProducts');
         
 
         // Get Sub Category data

@@ -150,7 +150,25 @@
                                 </div>
                             </div>	                                                                      
                         </div>
+                        <div class="card mb-3">
+                            <div class="card-body" >
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <label for="related_products">Related Product</label>
+                                        <select multiple class="related_products w-100" name="related_products[]"  id="related_products">
+                                            @if (!empty($relatedProducts))
+                                                @foreach ($relatedProducts as $relatedProduct)
+                                                    <option selected  value="{{ $relatedProduct->id }}">{{ $relatedProduct->title }}</option>
+                                                @endforeach
+                                            @endif
+                                        </select>
+                                        <p class="error"></p>	
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
                     <div class="col-md-4">
                         <div class="card mb-3">
                             <div class="card-body">	
@@ -237,6 +255,21 @@
 
 @section('customeJS')
    <script>
+
+        $('.related_products').select2({
+            ajax: {
+                url: "{{ route('product.getProducts') }}",
+                dataType: 'json',
+                tags: true,
+                multiple: true,
+                minimumInputLength: 3,
+                processResults: function (data) {
+                    return {
+                        results: data.tags
+                    };
+                }
+            }
+        });
         $('#title').change(function() {
             console.log('clicked');
             let element = $(this);
