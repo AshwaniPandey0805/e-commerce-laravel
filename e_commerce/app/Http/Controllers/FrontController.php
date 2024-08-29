@@ -12,10 +12,12 @@ class FrontController extends Controller
                             ->where('status' , 1)
                             ->orderBy('title', 'ASC')
                             ->with('product_images')
+                            ->take(8)
                             ->get();
         $latestProduct = Product::where('status', 1)
                                 ->orderBy('id','ASC')
                                 ->with('product_images')
+                                ->take(8)
                                 ->get();
         $data['featuredProducts'] = $featuredProducts; 
         $data['latestProduct'] = $latestProduct; 

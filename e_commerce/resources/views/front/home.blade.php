@@ -129,15 +129,22 @@
         </div>    
         <div class="row pb-3">
             @if ($featuredProducts->isNotEmpty())
-                
                 @foreach ($featuredProducts as $product)
                     @php
-                        $productImage = $product->product_images[0]->image   
-                    @endphp
+                        if ($product->product_images->isNotEmpty()) {
+                            $productImage = $product->product_images[0]->image;
+                        }
+                        @endphp
                     <div class="col-md-3">
                         <div class="card product-card">
                             <div class="product-image position-relative">
-                                <a href="" class="product-img"><img class="card-img-top" src="{{ asset('uploads/products/small/'.$productImage) }}" alt=""></a>
+                                <a href="{{ route('shop.product', $product->slug) }}" class="product-img">
+                                    
+                                    @if (!empty($productImage))
+                                        <img class="card-img-top" src="{{ asset('uploads/products/small/'.$productImage) }}" alt=""></a>
+                                    @else
+                                        <img class="card-img-top" src="{{ asset('admin-assets/img/default-150x150.png') }}" alt=""></a>
+                                    @endif
                                 <a class="whishlist" href="222"><i class="far fa-heart"></i></a>                            
     
                                 <div class="product-action">
@@ -171,12 +178,14 @@
                 
                 @foreach ($latestProduct as $product)
                     @php
-                        $productImage = $product->product_images[0]->image   
+                    if ($product->product_images->isNotEmpty()) {
+                            $productImage = $product->product_images[0]->image;
+                        }   
                     @endphp
                     <div class="col-md-3">
                         <div class="card product-card">
                             <div class="product-image position-relative">
-                                <a href="" class="product-img"><img class="card-img-top" src="{{ asset('uploads/products/small/'.$productImage) }}" alt=""></a>
+                                <a href="{{ route('shop.product', $product->slug) }}" class="product-img"><img class="card-img-top" src="{{ asset('uploads/products/small/'.$productImage) }}" alt=""></a>
                                 <a class="whishlist" href="222"><i class="far fa-heart"></i></a>                            
     
                                 <div class="product-action">

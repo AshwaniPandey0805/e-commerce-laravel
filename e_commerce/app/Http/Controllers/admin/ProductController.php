@@ -70,6 +70,9 @@ class ProductController extends Controller
             $product->sub_category_id = $request->sub_category;
             $product->brand_id = $request->brand;
             $product->is_featured = $request->is_featured;
+            $product->short_description = $request->short_description;
+            $product->shipping_return = $request->shipping_return;
+            $product->related_products = $request->related_products;
             $product->save();
 
             //Save Gallery Pics
@@ -185,6 +188,9 @@ class ProductController extends Controller
             $product->sub_category_id = $request->sub_category;
             $product->brand_id = $request->brand;
             $product->is_featured = $request->is_featured;
+            $product->short_description = $request->short_description;
+            $product->shipping_return = $request->shipping_return;
+            $product->related_products = $request->related_products;
             $product->save();
 
             //Save Gallery Pics
