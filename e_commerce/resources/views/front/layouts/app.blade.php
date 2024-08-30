@@ -146,9 +146,14 @@
 				<div class="footer-card">
 					<h3>My Account</h3>
 					<ul>
-						<li><a href="#" title="Sell">Login</a></li>
-						<li><a href="#" title="Advertise">Register</a></li>
-						<li><a href="#" title="Contact Us">My Orders</a></li>						
+						@if (Auth::check() == false)
+							<li><a href="{{ route('front.login') }}" title="Sell">Login</a></li>	
+							<li><a href="{{ route('front.register') }}" title="Advertise">Register</a></li>	
+						@else
+							<li><a href="{{ route('account.profile') }}" title="Contact Us">Profile</a></li> 
+							<li><a href="#" title="Contact Us">My Orders</a></li> 
+						@endif
+												
 					</ul>
 				</div>
 			</div>			
