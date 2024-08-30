@@ -8,6 +8,7 @@ use App\Http\Controllers\admin\ProductController;
 use App\Http\Controllers\admin\ProductImageController;
 use App\Http\Controllers\admin\SubCategoryController;
 use App\Http\Controllers\admin\TemImageController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\FrontController;
 use App\Http\Controllers\ProductSubCategoryController;
@@ -43,6 +44,19 @@ Route::post('/update-delete',[CartController::class, 'deleteCart'])->name('front
 
 
 
+
+Route::group(['prefix' => 'account'], function(){
+    Route::group(['middleware' => 'guest'], function(){
+        Route::get('/login', [AuthController::class, 'login'])->name('front.login');
+        Route::get('/register', [AuthController::class, 'register'])->name('front.register');
+        Route::post('/register/user', [AuthController::class, 'registerProcess'])->name('front.registerProcess');
+        Route::post('/login', [AuthController::class, 'authentication'])->name('front.authentication');
+    });
+    Route::group(['middleware' => 'auth'], function(){
+            Route::get('/profile',[AuthController::class, 'profile'])->name('account.profile');
+            Route::get('/logout',[AuthController::class, 'logout'])->name('account.logout');
+    });
+});
 
 Route::group(['prefix' => 'admin'], function(){
 
