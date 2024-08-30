@@ -8,6 +8,7 @@ use App\Http\Controllers\admin\ProductController;
 use App\Http\Controllers\admin\ProductImageController;
 use App\Http\Controllers\admin\SubCategoryController;
 use App\Http\Controllers\admin\TemImageController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\FrontController;
 use App\Http\Controllers\ProductSubCategoryController;
 use App\Http\Controllers\ShopController;
@@ -34,6 +35,11 @@ use Illuminate\Support\Str;
 Route::get('/',[FrontController::class,'index'])->name('front.index');
 Route::get('/shop/{categorySlug?}/{subcategorySlug?}', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/product/{slug}',[ShopController::class,'product'])->name('shop.product');
+Route::get('/cart',[CartController::class, 'cart'])->name('front.cart');
+Route::post('/add-to-cart', [CartController::class, 'addToCart'])->name('front.addToCart');
+Route::post('/update-cart',[CartController::class, 'updateCart'])->name('front.updateCart');
+Route::post('/update-delete',[CartController::class, 'deleteCart'])->name('front.deleteCart');
+
 
 
 

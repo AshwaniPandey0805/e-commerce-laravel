@@ -86,6 +86,7 @@ class ShopController extends Controller
         if($product == null){
             abort(404);
         }
+        $relatedProducts = [];
         if(!empty($product->related_products)){
             $relatedProductArray = explode(',' , $product->related_products);
             $relatedProducts = Product::whereIn('id', $relatedProductArray)->with('product_images')->get();
@@ -95,4 +96,6 @@ class ShopController extends Controller
         $data['relatedProducts'] = $relatedProducts;
         return view('front.product' ,$data );
     }
+
+    
 }

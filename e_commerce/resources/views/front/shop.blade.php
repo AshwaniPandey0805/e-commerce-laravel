@@ -4,7 +4,7 @@
     <div class="container">
         <div class="light-font">
             <ol class="breadcrumb primary-color mb-0">
-                <li class="breadcrumb-item"><a class="white-text" href="#">Home</a></li>
+                <li class="breadcrumb-item"><a class="white-text" href="{{ route('front.index') }}">Home</a></li>
                 <li class="breadcrumb-item active">Shop</li>
             </ol>
         </div>
@@ -111,14 +111,14 @@
                                 <div class="card product-card">
                                     <div class="product-image position-relative">
                                         @if (!empty($productImage))
-                                            <a href="" class="product-img"><img class="card-img-top" src="{{ asset('uploads/products/small/'.$productImage) }}" alt=""></a>
+                                            <a href="{{ route('shop.product', $product->slug) }}" class="product-img"><img class="card-img-top" src="{{ asset('uploads/products/small/'.$productImage) }}" alt=""></a>
                                         @else
-                                            <a href="" class="product-img"><img class="card-img-top" src="{{ asset('admin-assets/img/default-150x150.png') }}" alt=""></a>
+                                            <a href="{{ route('shop.product', $product->slug) }}" class="product-img"><img class="card-img-top" src="{{ asset('admin-assets/img/default-150x150.png') }}" alt=""></a>
                                         @endif
                                         <a class="whishlist" href="222"><i class="far fa-heart"></i></a>                            
         
                                         <div class="product-action">
-                                            <a class="btn btn-dark" href="#">
+                                            <a class="btn btn-dark" href="javascript:void(0);" onclick="addToCart( {{ $product->id }} )">
                                                 <i class="fa fa-shopping-cart"></i> Add To Cart
                                             </a>                            
                                         </div>
