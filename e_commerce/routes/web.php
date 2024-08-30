@@ -40,6 +40,7 @@ Route::get('/cart',[CartController::class, 'cart'])->name('front.cart');
 Route::post('/add-to-cart', [CartController::class, 'addToCart'])->name('front.addToCart');
 Route::post('/update-cart',[CartController::class, 'updateCart'])->name('front.updateCart');
 Route::post('/update-delete',[CartController::class, 'deleteCart'])->name('front.deleteCart');
+Route::get('/checkout',[CartController::class, 'checkout'])->name('front.checkout');
 
 
 

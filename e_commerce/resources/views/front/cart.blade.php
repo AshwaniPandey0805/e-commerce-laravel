@@ -107,7 +107,7 @@
                             <div>${{ $cartSubTotal }} </div>
                         </div>
                         <div class="pt-5">
-                            <a href="login.php" class="btn-dark btn btn-block w-100">Proceed to Checkout</a>
+                            <a href="{{ route('front.checkout') }}" class="btn-dark btn btn-block w-100">Proceed to Checkout</a>
                         </div>
                     </div>
                 </div>     
