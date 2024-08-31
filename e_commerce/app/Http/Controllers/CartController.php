@@ -7,6 +7,7 @@ use App\Models\CustomerAddress;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\ShippingCharge;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -152,11 +153,29 @@ class CartController extends Controller
 
         session()->forget('url.intented');
         // dd(Auth::user()->id);
+        
+        // Calculating shipping charge
         $customerAddress = CustomerAddress::where('user_id' , Auth::user()->id)->first();
-        // dd($customerAddress);
+        $shippingInfo = ShippingCharge::where('country_id', $customerAddress->country_id)->first();
+        $shippingAmount = $shippingInfo->charges;
+        $shippingCharge = 0.0;
+        $count = 0;
+        if(Cart::count() > 0){
+            $count = Cart::count();
+            $shippingCharge = $count * $shippingAmount;
+            
+        }
+        // $subTotalAmount = (double)(floatval(str_replace(',', '.', Cart::subtotal()))) + $shippingAmount;
+        // dd($subTotalAmount);
+        // Get the total as a formatted string
+        $totalString = Cart::subtotal(2, '.', ',');
+        $subTotal = floatval(str_replace(',', '', $totalString));
+        $subTotalAmount = $subTotal + $shippingCharge;
         $countries = Country::orderBy('name', 'ASC')->get();
         $data['countries'] = $countries;
         $data['customerAddress'] = $customerAddress;
+        $data['shippingCharge'] = $shippingCharge;
+        $data['subTotalAmount'] = $subTotalAmount;
          
         return view('front.checkout', $data);
     }
@@ -191,7 +210,7 @@ class CartController extends Controller
                     'email' => $request->email,
                     'mobile' => $request->mobile,
                     'country_id' => $request->country,
-                    'address' => $request->first_name,
+                    'address' => $request->address,
                     'apartement' => $request->appartment,
                     'city' => $request->city,
                     'state' => $request->state,
@@ -199,12 +218,26 @@ class CartController extends Controller
                 ]
             );
 
+            // Calculating shipping charge
+            $customerAddress = CustomerAddress::where('user_id' , Auth::user()->id)->first();
+            $shippingInfo = ShippingCharge::where('country_id', $customerAddress->country_id)->first();
+            $shippingAmount = $shippingInfo->charges;
+            $shippingCharge = 0.0;
+            $count = 0;
+            if(Cart::count() > 0){
+                $count = Cart::count();
+                $shippingCharge = $count * $shippingAmount;
+                
+            }
+            $totalString = Cart::subtotal(2, '.', ',');
+            $subTotal = floatval(str_replace(',', '', $totalString));
+            $subTotalAmount = $subTotal + $shippingCharge;
             // Save order Details
             if($request->payment_method == 'cod'){
-                $shipping  =  0;
+                $shipping  =  $shippingCharge;
                 $discount  =  0;
                 $subTotal = Cart::subtotal(2,'.','');
-                $grandtotal = Cart::subtotal(2,'.','');
+                $grandtotal = $subTotalAmount ;
 
                 $order = new Order();
                 $order->user_id = $user->id;

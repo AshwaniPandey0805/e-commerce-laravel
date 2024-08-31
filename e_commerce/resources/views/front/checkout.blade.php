@@ -23,23 +23,22 @@
                     <div class="card shadow-lg border-0">
                         <div class="card-body checkout-form">
                             <div class="row">
-                                
                                 <div class="col-md-12">
                                     <div class="mb-3">
-                                        <input type="text" value="{{ $customerAddress->first_name  }}"  name="first_name" id="first_name" class="form-control" placeholder="First Name">
+                                        <input type="text" @if ( $customerAddress != null ) value="{{ $customerAddress->first_name  }}" @endif    name="first_name" id="first_name" class="form-control" placeholder="First Name">
                                         <p ></p>
                                     </div>            
                                 </div>
                                 <div class="col-md-12">
                                     <div class="mb-3">
-                                        <input type="text" value="{{ $customerAddress->last_name  }}"  name="last_name" id="last_name" class="form-control" placeholder="Last Name">
+                                        <input type="text" @if ( $customerAddress != null ) value="{{ $customerAddress->last_name  }}" @endif name="last_name" id="last_name" class="form-control" placeholder="Last Name">
                                         <p ></p>
                                     </div>            
                                 </div>
                                 
                                 <div class="col-md-12">
                                     <div class="mb-3">
-                                        <input type="text" name="email" id="email" value="{{ $customerAddress->email  }}" class="form-control" placeholder="Email">
+                                        <input type="text" name="email" id="email" @if ( $customerAddress != null ) value="{{ $customerAddress->email  }}" @endif class="form-control" placeholder="Email">
                                         <p ></p>
                                     </div>            
                                 </div>
@@ -50,7 +49,7 @@
                                             @if($countries->isNotEmpty())
                                                 <option value="">Select a Country</option>
                                                 @foreach ($countries as $country)
-                                                    <option {{ ($customerAddress->country_id == $country->id ? 'selected' : '') }} value="{{ $country->id }}">{{ $country->name}}</option>        
+                                                    <option @if ( $customerAddress != null )  {{ ($customerAddress->country_id == $country->id ? 'selected' : '') }} @endif  value="{{ $country->id }}">{{ $country->name}}</option>        
                                                 @endforeach
                                                 
                                             @endif
@@ -61,42 +60,42 @@
     
                                 <div class="col-md-12">
                                     <div class="mb-3">
-                                        <textarea name="address" id="address" value="{{ $customerAddress->address  }}" cols="30" rows="3" placeholder="Address" class="form-control"></textarea>
+                                        <textarea name="address" id="address"  cols="30" rows="3" placeholder="Address" class="form-control">@if ( $customerAddress != null ) {{ $customerAddress->address  }} @endif</textarea>
                                         <p ></p>
                                     </div>            
                                 </div>
     
                                 <div class="col-md-12">
                                     <div class="mb-3">
-                                        <input type="text" name="appartment" value="{{ $customerAddress->apartement  }}" id="appartment" class="form-control" placeholder="Apartment, suite, unit, etc. (optional)">
+                                        <input type="text" name="appartment" @if ( $customerAddress != null ) value="{{ $customerAddress->apartement  }}" @endif id="appartment" class="form-control" placeholder="Apartment, suite, unit, etc. (optional)">
                                         <p ></p>
                                     </div>            
                                 </div>
     
                                 <div class="col-md-4">
                                     <div class="mb-3">
-                                        <input type="text" name="city" id="city" value="{{ $customerAddress->city  }}" class="form-control" placeholder="City">
+                                        <input type="text" name="city" id="city" @if ( $customerAddress != null ) value="{{ $customerAddress->city  }}" @endif class="form-control" placeholder="City">
                                         <p ></p>
                                     </div>            
                                 </div>
     
                                 <div class="col-md-4">
                                     <div class="mb-3">
-                                        <input type="text" name="state" id="state" value="{{ $customerAddress->state  }}" class="form-control" placeholder="State">
+                                        <input type="text" name="state" id="state" @if ( $customerAddress != null ) value="{{ $customerAddress->state  }}" @endif class="form-control" placeholder="State">
                                         <p ></p>
                                     </div>            
                                 </div>
                                 
                                 <div class="col-md-4">
                                     <div class="mb-3">
-                                        <input type="text" name="zip" id="zip" value="{{ $customerAddress->zip_code  }}" class="form-control" placeholder="Zip">
+                                        <input type="text" name="zip" id="zip" @if ( $customerAddress != null ) value="{{ $customerAddress->zip_code }}" @endif class="form-control" placeholder="Zip">
                                         <p ></p>
                                     </div>            
                                 </div>
     
                                 <div class="col-md-12">
                                     <div class="mb-3">
-                                        <input type="text" name="mobile" id="mobile" value="{{ $customerAddress->mobile  }}" class="form-control" placeholder="Mobile No.">
+                                        <input type="text" name="mobile" id="mobile" @if ( $customerAddress != null ) value="{{ $customerAddress->mobile  }}" @endif class="form-control" placeholder="Mobile No.">
                                         <p ></p>
                                     </div>            
                                 </div>
@@ -132,11 +131,11 @@
                             </div>
                             <div class="d-flex justify-content-between mt-2">
                                 <div class="h6"><strong>Shipping</strong></div>
-                                <div class="h6"><strong>$20</strong></div>
+                                <div class="h6"><strong>${{ number_format($shippingCharge, 2, '.', ',') }}</strong></div>
                             </div>
                             <div class="d-flex justify-content-between mt-2 summery-end">
                                 <div class="h5"><strong>Total</strong></div>
-                                <div class="h5"><strong>${{ Cart::subtotal() }}</strong></div>
+                                <div class="h5"><strong>${{ number_format($subTotalAmount, 2, '.', ',') }}</strong></div>
                             </div>                            
                         </div>
                     </div>   

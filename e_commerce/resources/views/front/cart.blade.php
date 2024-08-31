@@ -98,10 +98,10 @@
                             <div>Subtotal</div>
                             <div>${{ $cartSubTotal }}</div>
                         </div>
-                        <div class="d-flex justify-content-between pb-2">
+                        {{-- <div class="d-flex justify-content-between pb-2">
                             <div>Shipping</div>
                             <div>$20</div>
-                        </div>
+                        </div> --}}
                         <div class="d-flex justify-content-between summery-end">
                             <div>Total</div>
                             <div>${{ $cartSubTotal }} </div>
