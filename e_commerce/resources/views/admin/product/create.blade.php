@@ -292,8 +292,8 @@
                             $(`#${key}`).addClass('is-invalid')
                             .siblings('p')
                             .addClass('invalid-feedback')
-                            .html(value)
-                        })
+                            .html(value);
+                        });
 
                     }
 
