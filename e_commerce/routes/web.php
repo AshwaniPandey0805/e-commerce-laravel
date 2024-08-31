@@ -12,6 +12,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\FrontController;
 use App\Http\Controllers\ProductSubCategoryController;
+use App\Http\Controllers\ShippingController;
 use App\Http\Controllers\ShopController;
 use App\Models\TempImage;
 use Illuminate\Support\Facades\Redis;
@@ -120,6 +121,13 @@ Route::group(['prefix' => 'admin'], function(){
         Route::put('/product/{id}/update',[ProductController::class,'update'])->name('product.update');
         Route::any('/product/{id}/delete',[ProductController::class,'delete'])->name('product.delete');
         Route::get('/product/related-product', [ProductController::class, 'getProducts'])->name('product.getProducts');
+
+        //Shipping Routes
+        Route::get('/shipping/create', [ShippingController::class,'create'])->name('shipping.create');
+        Route::post('/shipping/store', [ShippingController::class,'store'])->name('shipping.store');
+        Route::get('/shipping/{id}/edit', [ShippingController::class,'edit'])->name('shipping.edit');
+        Route::put('/shipping/{id}/update', [ShippingController::class,'update'])->name('shipping.update');
+        Route::any('/shipping/{id}/delete', [ShippingController::class,'delete'])->name('shipping.delete');
         
 
         // Get Sub Category data
