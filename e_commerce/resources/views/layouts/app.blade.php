@@ -12,6 +12,7 @@
 		<!-- Theme style -->
 		<link rel="stylesheet" href="{{ asset('admin-assets/css/adminlte.min.css') }}">
 		<link rel="stylesheet" href="{{ asset('admin-assets/css/custom.css') }}">
+		<link rel="stylesheet" href="{{ asset('admin-assets/css/datetimepicker.css') }}">
 		<link rel="stylesheet" href="{{ asset('admin-assets/plugins/summernote/summernote.min.css') }}">
 		<link rel="stylesheet" href="{{ asset('admin-assets/plugins/select2/css/select2.min.css') }}">
 		<meta name="csrf-token" content="{{ csrf_token() }}" >
@@ -86,6 +87,7 @@
 		<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 		<!-- AdminLTE App -->
 		<script src="{{ asset('admin-assets/js/adminlte.min.js') }}"></script>
+		<script src="{{ asset('admin-assets/js/datetimepicker.js') }}"></script>
 		<!-- AdminLTE for demo purposes -->
 		<script src="{{ asset('admin-assets/js/demo.js') }}"></script>
 		{{-- include dropzone min.js file --}}
@@ -101,9 +103,11 @@
 
 			$(document).ready(function(){
 				$('.summernote').summernote({
-					height : 250
+					height : 150
 				});
 			});
+
+			
 
 		</script>
 
