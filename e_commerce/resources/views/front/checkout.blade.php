@@ -127,15 +127,15 @@
                             @endif
                             <div class="d-flex justify-content-between summery-end">
                                 <div class="h6"><strong>Subtotal</strong></div>
-                                <div class="h6"><strong>${{ Cart::subtotal() }}</strong></div>
+                                <div class="h6"><strong>$ {{ Cart::subtotal() }}</strong></div>
                             </div>
                             <div class="d-flex justify-content-between mt-2">
                                 <div class="h6"><strong>Shipping</strong></div>
-                                <div class="h6"><strong>${{ number_format($shippingCharge, 2, '.', ',') }}</strong></div>
+                                <div class="h6"><strong id="shipping_amount" >$ {{ number_format($shippingCharge, 2, '.', ',') }}</strong></div>
                             </div>
                             <div class="d-flex justify-content-between mt-2 summery-end">
                                 <div class="h5"><strong>Total</strong></div>
-                                <div class="h5"><strong>${{ number_format($subTotalAmount, 2, '.', ',') }}</strong></div>
+                                <div class="h5"><strong id="sub_total_amount" >$ {{ number_format($subTotalAmount, 2, '.', ',') }}</strong></div>
                             </div>                            
                         </div>
                     </div>   
@@ -316,6 +316,41 @@
                 }
             });
         });
+
+        $("#country").change(function(){
+            console.log('clicked');
+            var countryId = $(this).val(); // getting country id
+            $.ajax({
+                url : "{{route('front.calculateShippingCharge')}}",
+                type : 'get',
+                data : { country_id : countryId },
+                dataType : 'json',
+                success : function ( response ){
+                    // console.log(response);
+                    var data = response['data'];
+                    var subTotalAmount = data['subTotalAmount'];
+                    var shippingCharge = data['shippingCharge'];
+                    let formattedSubTotalAmount = subTotalAmount.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                    let formattedShippingCharge = shippingCharge.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+
+                    $("#shipping_amount").html("$ "+formattedShippingCharge)
+                    $("#sub_total_amount").html("$ "+formattedSubTotalAmount)
+                    
+                    
+                },
+                error : function ( error ){
+                    console.log(error.message());
+                    
+                }
+            })
+            
+        })
 
     </script>
 @endsection

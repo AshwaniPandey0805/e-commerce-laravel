@@ -43,6 +43,7 @@ Route::post('/update-cart',[CartController::class, 'updateCart'])->name('front.u
 Route::post('/update-delete',[CartController::class, 'deleteCart'])->name('front.deleteCart');
 Route::get('/checkout',[CartController::class, 'checkout'])->name('front.checkout');
 Route::post('/checkout-process',[CartController::class, 'checkoutProcess'])->name('front.checkoutProcess');
+Route::get('/shipping-charge/calculate', [CartController::class, 'calculateShippingCharge'])->name('front.calculateShippingCharge');
 Route::get('/thank/{id}',[CartController::class, 'thankYou'])->name('front.thankYou');
 
 

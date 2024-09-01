@@ -290,6 +290,77 @@ class CartController extends Controller
             ]);
         }
     }
+
+    public function calculateShippingCharge(Request $request){
+
+        $shippingInfo = ShippingCharge::where('country_id', $request->country_id)->first();
+        // dd($shippingInfo);
+        if($shippingInfo == null){
+            $shippingCharge = 0.0;
+            $totalString = Cart::subtotal(2, '.', ',');
+            $subTotal = floatval(str_replace(',', '', $totalString));
+            $subTotalAmount = $subTotal + $shippingCharge;
+            
+            return response()->json([
+                'status' => true,
+                'data' => [
+                    'subTotalAmount' => $subTotalAmount,
+                    'shippingCharge' => $shippingCharge
+                ],
+            ]);
+        }
+        
+        $user = Auth::user();
+        $customerAddress = CustomerAddress::where('user_id', $user->id)->first();
+        $customerAddress->country_id = $request->country_id;
+        $customerAddress->save();
+
+        if($shippingInfo != null){
+            $shippingAmount = $shippingInfo->charges;
+
+            // calculation
+            $shippingCharge = 0.0;
+            $count = 0;
+            if(Cart::count() > 0){
+                $count = Cart::count();
+                $shippingCharge = $count * $shippingAmount;
+                
+            }
+            $totalString = Cart::subtotal(2, '.', ',');
+            $subTotal = floatval(str_replace(',', '', $totalString));
+            $subTotalAmount = $subTotal + $shippingCharge;
+            
+            return response()->json([
+                'status' => true,
+                'data' => [
+                    'subTotalAmount' => $subTotalAmount,
+                    'shippingCharge' => $shippingCharge
+                ],
+            ]);
+            
+        } else {
+
+            $shippingCharge = 0.0;
+            $count = 0;
+            if(Cart::count() > 0){
+                $count = Cart::count();
+                $shippingCharge = $count * 20.0;
+                
+            }
+            $totalString = Cart::subtotal(2, '.', ',');
+            $subTotal = floatval(str_replace(',', '', $totalString));
+            $subTotalAmount = $subTotal + $shippingCharge;
+            
+            return response()->json([
+                'status' => true,
+                'data' => [
+                    'subTotalAmount' => $subTotalAmount,
+                    'shippingCharge' => $shippingCharge
+                ],
+            ]);
+        }
+        
+    }
     
     public function thankYou($id){
         $orderDetail = Order::find($id);
