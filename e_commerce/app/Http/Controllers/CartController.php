@@ -152,25 +152,37 @@ class CartController extends Controller
         }
 
         session()->forget('url.intented');
-        // dd(Auth::user()->id);
         
         // Calculating shipping charge
         $customerAddress = CustomerAddress::where('user_id' , Auth::user()->id)->first();
         $shippingInfo = ShippingCharge::where('country_id', $customerAddress->country_id)->first();
-        $shippingAmount = $shippingInfo->charges;
-        $shippingCharge = 0.0;
-        $count = 0;
-        if(Cart::count() > 0){
-            $count = Cart::count();
-            $shippingCharge = $count * $shippingAmount;
-            
+        if($shippingInfo != null ){
+            $shippingAmount = $shippingInfo->charges;
+            $shippingCharge = 0.0;
+            $count = 0;
+            if(Cart::count() > 0){
+                $count = Cart::count();
+                $shippingCharge = $count * $shippingAmount;
+                
+            }
+            $totalString = Cart::subtotal(2, '.', ',');
+            $subTotal = floatval(str_replace(',', '', $totalString));
+            $subTotalAmount = $subTotal + $shippingCharge;    
+        } else {
+            $shippingAmount = 0.0;
+            $shippingCharge = 0.0;
+            $count = 0;
+            if(Cart::count() > 0){
+                $count = Cart::count();
+                $shippingCharge = $count * $shippingAmount;
+                
+            }
+            $totalString = Cart::subtotal(2, '.', ',');
+            $subTotal = floatval(str_replace(',', '', $totalString));
+            $subTotalAmount = $subTotal + $shippingCharge;
         }
-        // $subTotalAmount = (double)(floatval(str_replace(',', '.', Cart::subtotal()))) + $shippingAmount;
-        // dd($subTotalAmount);
-        // Get the total as a formatted string
-        $totalString = Cart::subtotal(2, '.', ',');
-        $subTotal = floatval(str_replace(',', '', $totalString));
-        $subTotalAmount = $subTotal + $shippingCharge;
+        
+
         $countries = Country::orderBy('name', 'ASC')->get();
         $data['countries'] = $countries;
         $data['customerAddress'] = $customerAddress;
@@ -300,6 +312,11 @@ class CartController extends Controller
             $totalString = Cart::subtotal(2, '.', ',');
             $subTotal = floatval(str_replace(',', '', $totalString));
             $subTotalAmount = $subTotal + $shippingCharge;
+
+            $user = Auth::user();
+            $customerAddress = CustomerAddress::where('user_id', $user->id)->first();
+            $customerAddress->country_id = $request->country_id;
+            $customerAddress->save();
             
             return response()->json([
                 'status' => true,
