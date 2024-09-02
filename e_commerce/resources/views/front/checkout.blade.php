@@ -127,7 +127,11 @@
                             @endif
                             <div class="d-flex justify-content-between summery-end">
                                 <div class="h6"><strong>Subtotal</strong></div>
-                                <div class="h6"><strong>$ {{ Cart::subtotal() }}</strong></div>
+                                @if ($subTotal > 0)
+                                    <div class="h6"><strong id="total_amount" >$ {{ number_format($subTotal, 2, '.', ',') }} </strong></div>    
+                                @else
+                                    <div class="h6"><strong id="total_amount" >$ {{ Cart::subtotal() }} </strong></div>
+                                @endif
                             </div>
                             <div class="d-flex justify-content-between mt-2">
                                 <div class="h6"><strong>Shipping</strong></div>
@@ -138,8 +142,15 @@
                                 <div class="h5"><strong id="sub_total_amount" >$ {{ number_format($subTotalAmount, 2, '.', ',') }}</strong></div>
                             </div>                            
                         </div>
-                    </div>   
-                    
+                    </div>      
+                    <div class="input-group apply-coupan mt-4">
+                        <input type="text" id="applied-coupon" @if (session()->has('coupon_code')) value="{{ session()->get('coupon_code') }}"
+                        @endif placeholder="Coupon Code" class="form-control">
+                        <button class="btn btn-dark" type="button" id="button-addon2">Apply Coupon</button>
+                    </div> 
+                    <div class="mt-4" >
+                        <p id="coupon-error" ></p>
+                    </div>
                     <div class="card payment-form ">    
                         <h3 class="card-title h5 mb-3">Payment Method</h3>
                         <div class="">
@@ -195,6 +206,39 @@
                 $("#card_payment_from").removeClass('d-none');
             }
         });
+
+        $("#button-addon2").click(function(){
+            var couponCode = $("#applied-coupon").val();
+            var countryId = $("#country").val();
+            $.ajax({
+                url : "{{ route('front.applyDiscountCoupun') }}",
+                type : 'post',
+                data : { coupon_code : couponCode , country_id : countryId },
+                dataType : 'json',
+                success : function ( response ){
+                    var errors = response['errors'];
+                    if(response['status'] ==  false){
+                        if(errors['applied-coupon']){
+                            console.log(errors['applied-coupon'])
+                            $("#applied-coupon").addClass('is-invalid');
+                            $("#coupon-error").addClass('text-danger').html(errors['applied-coupon'])
+                            
+                        } else {
+                            $("#applied-coupon").removeClass('is-invalid');
+                            $("#coupon-error").removeClass('text-danger').html(errors['applied-coupon'])
+                        }
+                    } else {
+
+                        $("#total").html("$ "+response['amount_after_discount']);
+                        $("#shipping_amount").html("$ "+response['shipping_amount']);
+                        $("#sub_total_amount").html("$ "+response['sub_total_amount'])
+                    }
+                },
+                error : function ( error ){
+                    console.log('error message', error.message);
+                }
+            })
+        })
 
         $("#checkoutForm").submit(function( event ){
             event.preventDefault();
@@ -305,6 +349,8 @@
                             .siblings('p').removeClass('invalid-feedback')
                             .html('')
                         }
+
+                        
                     } else {
                         $("button[type='submit']").prop('disabled', false);
                         window.location.href = "{{ url('/thank') }}/"+response.order_id;
@@ -330,17 +376,12 @@
                     var data = response['data'];
                     var subTotalAmount = data['subTotalAmount'];
                     var shippingCharge = data['shippingCharge'];
-                    let formattedSubTotalAmount = subTotalAmount.toLocaleString('en-US', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    });
-                    let formattedShippingCharge = shippingCharge.toLocaleString('en-US', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    });
+                    var subTotal = data['subTotal'];
+                    
 
-                    $("#shipping_amount").html("$ "+formattedShippingCharge)
-                    $("#sub_total_amount").html("$ "+formattedSubTotalAmount)
+                    $("#shipping_amount").html("$ "+shippingCharge)
+                    $("#sub_total_amount").html("$ "+subTotalAmount)
+                    $("#total_amount").html("$ "+subTotal)
                     
                     
                 },

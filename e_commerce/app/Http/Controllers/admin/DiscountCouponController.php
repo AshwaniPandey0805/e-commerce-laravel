@@ -29,30 +29,31 @@ class DiscountCouponController extends Controller
 
         if($validator->passes()){
 
-            if(!empty($request->start_at)){
-                $now = Carbon::now();
-                $start_at = Carbon::createFromFormat('Y-m-d H:i:s', $request->start_at);
+            // if(!empty($request->start_at)){
+            //     $now = Carbon::now();
+            //     $start_at = Carbon::createFromFormat('Y-m-d H:i:s', $request->start_at);
 
-                if($start_at->lte($now)){
-                    return response()->json([
-                        'status' => false,
-                        'errors' => ['start_at' => 'should be less the current date and time value']
-                    ]);
-                }
-            }
+            //     if($start_at->lte($now)){
+            //         return response()->json([
+            //             'status' => false,
+            //             'errors' => ['start_at' => 'should be greater the current date and time value']
+            //         ]);
+            //     }
+            // }
 
-            if(!empty($request->end_at)){
-                $start_at = Carbon::createFromFormat('Y-m-d H:i:s', $request->start_at);
+            // if(!empty($request->end_at)){
+            //     $start_at = Carbon::createFromFormat('Y-m-d H:i:s', $request->start_at);
+            //     $end_at = Carbon::createFromFormat('Y-m-d H:i:s', $request->end_at);
+
+            //     if($end_at->lte($start_at)){
+            //         return response()->json([
+            //             'status' => false,
+            //             'errors' => ['end_at' => 'should be greater than start date and time'] 
+            //         ]);
+            //     }
+            // }
+            $start_at = Carbon::createFromFormat('Y-m-d H:i:s', $request->start_at);
                 $end_at = Carbon::createFromFormat('Y-m-d H:i:s', $request->end_at);
-
-                if($end_at->lte($start_at)){
-                    return response()->json([
-                        'status' => false,
-                        'errors' => ['end_at' => 'should be greater than start date and time'] 
-                    ]);
-                }
-            }
-
             $coupon = new DiscountCoupon();
             $coupon->code = $request->code;
             $coupon->name = $request->name;
@@ -110,30 +111,31 @@ class DiscountCouponController extends Controller
 
         if($validator->passes()){
 
-            if(!empty($request->start_at)){
-                $now = Carbon::now();
-                $start_at = Carbon::createFromFormat('Y-m-d H:i:s', $request->start_at);
+            // if(!empty($request->start_at)){
+            //     $now = Carbon::now();
+            //     $start_at = Carbon::createFromFormat('Y-m-d H:i:s', $request->start_at);
 
-                if($start_at->lte($now)){
-                    return response()->json([
-                        'status' => false,
-                        'errors' => ['start_at' => 'should be less the current date and time value']
-                    ]);
-                }
-            }
+            //     if($start_at->lte($now)){
+            //         return response()->json([
+            //             'status' => false,
+            //             'errors' => ['start_at' => 'should be greater the current date and time value']
+            //         ]);
+            //     }
+            // }
 
-            if(!empty($request->end_at)){
-                $start_at = Carbon::createFromFormat('Y-m-d H:i:s', $request->start_at);
+            // if(!empty($request->end_at)){
+            //     $start_at = Carbon::createFromFormat('Y-m-d H:i:s', $request->start_at);
+            //     $end_at = Carbon::createFromFormat('Y-m-d H:i:s', $request->end_at);
+
+            //     if($end_at->lte($start_at)){
+            //         return response()->json([
+            //             'status' => false,
+            //             'errors' => ['end_at' => 'should be greater than start date and time'] 
+            //         ]);
+            //     }
+            // }
+            $start_at = Carbon::createFromFormat('Y-m-d H:i:s', $request->start_at);
                 $end_at = Carbon::createFromFormat('Y-m-d H:i:s', $request->end_at);
-
-                if($end_at->lte($start_at)){
-                    return response()->json([
-                        'status' => false,
-                        'errors' => ['end_at' => 'should be greater than start date and time'] 
-                    ]);
-                }
-            }
-
             // $coupon = new DiscountCoupon();
             $coupon->code = $request->code;
             $coupon->name = $request->name;
