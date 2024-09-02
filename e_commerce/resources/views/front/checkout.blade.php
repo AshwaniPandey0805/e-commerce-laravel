@@ -144,18 +144,25 @@
                         </div>
                     </div>      
                     <div class="input-group apply-coupan mt-4">
-                        <input type="text" id="applied-coupon" @if (session()->has('coupon_code')) value="{{ session()->get('coupon_code') }}"
+                        <input type="text" id="applied-coupon" name="applied_coupon" @if (session()->has('coupon_code')) value="{{ session()->get('coupon_code') }}"
                         @endif placeholder="Coupon Code" class="form-control">
                         @if (session()->has('coupon_code'))
-                            <button disabled class="btn btn-dark"  type="button" id="button-addon2">Apply Coupon</button>    
+                            <button disabled  class="btn btn-dark"  type="button" id="button-addon2">Apply Coupon</button>    
                         @else
-                            <button class="btn btn-dark"  type="button" id="button-addon2">Apply Coupon</button>    
+                            <button  class="btn btn-dark"  type="button" id="button-addon2">Apply Coupon</button>
                         @endif
-                        
                     </div> 
                     <div class="mt-4" >
                         <p id="coupon-error" ></p>
-                    </div>
+                    </div >
+                    @if (session()->has('coupon_code'))
+                        <div id="coupon_list" class="mt-4">
+                            <strong>{{ session()->get('coupon_code') }}</strong>
+                            <a href="" class="btn btn-sm btn-danger" id="remove_coupon" ><i class="fa fa-times"></i></a>
+                        </div>    
+                    @endif
+                    
+                    
                     <div class="card payment-form ">    
                         <h3 class="card-title h5 mb-3">Payment Method</h3>
                         <div class="">
@@ -237,13 +244,39 @@
                         $("#total_amount").html("$ "+response['amount_after_discount']);
                         $("#shipping_amount").html("$ "+response['shipping_amount']);
                         $("#sub_total_amount").html("$ "+response['sub_total_amount'])
+                        // Reload the current page
+                        window.location.href = "{{ route('front.checkout') }}"
+                        
+                        
                     }
                 },
                 error : function ( error ){
                     console.log('error message', error.message);
                 }
             })
-        })
+        });
+
+       $("#remove_coupon").click(function(event){
+            event.preventDefault();
+            $.ajax({
+                url : "{{ route('front.removeDiscountCoupun') }}",
+                type : 'post',
+                data : {
+                    'country_code' : $("#country").val()
+                },
+                dataType : 'json',
+                success : function ( response ){
+                    if(response['status'] == true){
+                        
+                        // window.location.reload();
+                        window.location.href = "{{ route('front.checkout') }}"
+                    }
+                },
+                error : function ( error ){
+                    console.log('errors', error.message);
+                }
+            });
+       });
 
         $("#checkoutForm").submit(function( event ){
             event.preventDefault();
@@ -357,6 +390,7 @@
 
                         
                     } else {
+                        // $("#button-addon2").prop('disabled', false);
                         $("button[type='submit']").prop('disabled', false);
                         window.location.href = "{{ url('/thank') }}/"+response.order_id;
                     }

@@ -63,7 +63,7 @@
                                     <label for="type">Discount Type</label>
                                     <select name="type" id="type" class="form-control" >
                                         <option {{ ($coupon->type == 'percent') ? 'selected' : '' }}  value="percent">Percentag (%)</option>
-                                        <option {{ ($coupon->type == 'percent') ? 'selected' : '' }}  value="fixed">Fixed (0.0)</option>
+                                        <option {{ ($coupon->type == 'fixed') ? 'selected' : '' }}  value="fixed">Fixed (0.0)</option>
                                     </select>
                                     <p></p>	
                                 </div>

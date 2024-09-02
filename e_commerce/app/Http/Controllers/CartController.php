@@ -172,8 +172,8 @@ class CartController extends Controller
                 $discount = ($subTotal * $discountAmmount) / 100;
                 $amountAfterDiscount = $subTotal - $discount;
             } else {
-                $discount = $subTotal * $discountAmmount;
-                $amountAfterDiscount = $subTotal - $discount;
+                $amountAfterDiscount = $subTotal - $discountAmmount;
+                // $amountAfterDiscount = $subTotal - $discount;
             }
             if($shippingAmount != null){
                 $shippingCharge = $shippingAmount->charges * Cart::count();
@@ -199,10 +199,10 @@ class CartController extends Controller
 
         }
         
-
+        // dd($amountAfterDiscount);
         $countries = Country::orderBy('name', 'ASC')->get();
         $data['countries'] = $countries;
-        $data['subTotal'] = $amountAfterDiscount;
+        $data['subTotal'] = ( $amountAfterDiscount > 0.0 ) ? $amountAfterDiscount : $subTotal  ;
         $data['customerAddress'] = $customerAddress;
         $data['shippingCharge'] = $shippingCharge;
         $data['subTotalAmount'] = $subTotalAmount;
@@ -249,32 +249,54 @@ class CartController extends Controller
             );
 
             // Calculating shipping charge
+            $shippingCharge = 0.0;
             $customerAddress = CustomerAddress::where('user_id' , Auth::user()->id)->first();
             $shippingInfo = ShippingCharge::where('country_id', $customerAddress->country_id)->first();
-            $shippingAmount = $shippingInfo->charges;
-            $shippingCharge = 0.0;
+            $shippingAmount = ( $shippingInfo != null ) ? $shippingInfo->charges : 0.0;
             $count = 0;
             if(Cart::count() > 0){
                 $count = Cart::count();
                 $shippingCharge = $count * $shippingAmount;
-                
             }
             $totalString = Cart::subtotal(2, '.', ',');
             $subTotal = floatval(str_replace(',', '', $totalString));
             $subTotalAmount = $subTotal + $shippingCharge;
+            $discount = 0.0;
+            $amountAfterDiscount = 0.0;
             // Save order Details
             if($request->payment_method == 'cod'){
+
+                if(session()->has('coupon_code')){
+                    $coupon = DiscountCoupon::where('code', session()->get('coupon_code'))->first();
+                    $discountAmmount = $coupon->discount_amount;
+                    if($coupon->type == 'percent'){
+                        $discount = ($subTotal * $discountAmmount) / 100;
+                        $amountAfterDiscount = $subTotal - $discount;
+                    } else {
+                        $amountAfterDiscount = $subTotal - $discountAmmount;
+                        // $amountAfterDiscount = $subTotal - $discount;
+                    }
+
+                    if($shippingAmount != null){
+                        // $shippingCharge = $shippingAmount->charges * Cart::count();
+                        $subTotalAmount = $shippingCharge + $amountAfterDiscount;
+                    } else {
+                        $subTotalAmount = $shippingCharge + $amountAfterDiscount;
+                    }
+                } 
+                
                 $shipping  =  $shippingCharge;
-                $discount  =  0;
-                $subTotal = Cart::subtotal(2,'.','');
+                $discountPrice  = $discount;  
+                $subTotal = ( $amountAfterDiscount > 0.0 ) ? $amountAfterDiscount : Cart::subtotal(2,'.','');
                 $grandtotal = $subTotalAmount ;
 
                 $order = new Order();
                 $order->user_id = $user->id;
                 $order->subtotal = $subTotal;
                 $order->shipping = $shipping;
-                $order->discount = $discount;
+                $order->discount = $discountPrice;
                 $order->grand_total = $grandtotal;
+                $order->coupon_code = $request->applied_coupon;
                 
                 $order->first_name = $request->first_name;
                 $order->last_name = $request->last_name;
@@ -287,6 +309,15 @@ class CartController extends Controller
                 $order->state = $request->state;
                 $order->zip_code = $request->zip;
                 $order->save();
+
+                // Manipluate coupoun usage 
+
+                if(isset($order->coupon_code)){
+                    if(isset($coupon)){
+                        $coupon->max_uses -= 1;
+                        $coupon->save();
+                    }
+                }
 
                 
             }
@@ -302,6 +333,7 @@ class CartController extends Controller
                 $orderItem->save();
             }
 
+            session()->forget('coupon_code');
             $request->session()->flash('success', 'Order saved successfully');
             Cart::destroy();
             return response()->json([
@@ -342,6 +374,7 @@ class CartController extends Controller
                             ->first();
 
         if($shippingInfo == null){
+            // dd("1");
             if(session()->has('coupon_code')){
                 $coupon = DiscountCoupon::where('code', session()->get('coupon_code'))->first();
                 $discountAmmount = $coupon->discount_amount;
@@ -349,8 +382,8 @@ class CartController extends Controller
                     $discount = ($subTotal * $discountAmmount) / 100;
                     $amountAfterDiscount = $subTotal - $discount;
                 } else {
-                    $discount = $subTotal * $discountAmmount;
-                    $amountAfterDiscount = $subTotal - $discount;
+                    $amountAfterDiscount = $subTotal - $discountAmmount;
+                    // $amountAfterDiscount = $subTotal - $discount;
                 }
 
                 if($shippingAmount != null){
@@ -360,6 +393,7 @@ class CartController extends Controller
                     $subTotalAmount = $shippingChargeAmount + $amountAfterDiscount; 
                 }
             } else {
+                $amountAfterDiscount = $subTotal; 
                 $subTotalAmount = $subTotal + $shippingCharge;
             }
             
@@ -380,8 +414,8 @@ class CartController extends Controller
                 $discount = ($subTotal * $discountAmmount) / 100;
                 $amountAfterDiscount = $subTotal - $discount;
             } else {
-                $discount = $subTotal * $discountAmmount;
-                $amountAfterDiscount = $subTotal - $discount;
+                $amountAfterDiscount = $subTotal - $discountAmmount;
+                // $amountAfterDiscount = $subTotal - $discount;
             }
             if($shippingAmount != null){
                 $shippingCharge = $shippingAmount->charges * Cart::count();
@@ -417,6 +451,7 @@ class CartController extends Controller
     }
 
     public function applyDiscountCoupon(Request $request){
+        
         $coupon = DiscountCoupon::where('code', $request->coupon_code)->first();
         session()->put('coupon_code', $request->coupon_code);
         if(!empty($coupon)){
@@ -451,27 +486,32 @@ class CartController extends Controller
             }
             // check the status
             if($coupon->status == 1 ){
+                
                 $discountAmmount = $coupon->discount_amount;
                 //check the type of
                 if($coupon->type == 'percent'){
+                    
                     $discount = ($subtotalAmountFloat * $discountAmmount) / 100;
                     $amountAfterDiscount = $subtotalAmountFloat - $discount;
                 } else {
-                    $discount = $subtotalAmountFloat * $discountAmmount;
-                    $amountAfterDiscount = $subtotalAmountFloat - $discount;
+                    
+                    $amountAfterDiscount = $subtotalAmountFloat - $discountAmmount; // 1140-20 = 1120()
+                    // $amountAfterDiscount = $subtotalAmountFloat - $discount;
                 }
                 // add ship amount
                 if($shippingAmount != null){
-                    $shippingChargeAmount = $shippingAmount->charges;
-                    $subTotal = $shippingChargeAmount + $amountAfterDiscount;
+                    $shippingChargeAmount = $shippingAmount->charges * Cart::count(); // 10 * 2 = 20
+                    $subTotal = $shippingChargeAmount + $amountAfterDiscount; // 20 + 1120 = 1400
                 } else {
                     $subTotal = $shippingChargeAmount + $amountAfterDiscount;
                 }
+                // dd($amountAfterDiscount, $subTotal, $subtotalAmountFloat);
                 return response()->json([
                     'status' => true,
                     'shipping_amount' => number_format($shippingChargeAmount, 2, '.', ','),
                     'amount_after_discount' => number_format($amountAfterDiscount, 2, '.', ','),
-                    'sub_total_amount' => number_format($subTotal, 2, '.', ',')
+                    'sub_total_amount' => number_format($subTotal, 2, '.', ','),
+                    'coupon_code' => (session()->has('coupon_code')) ? session()->get('coupon_code') : ''
                 ]); 
                 
             } else {
@@ -489,6 +529,15 @@ class CartController extends Controller
         }
 
         
+    }
+
+    public function removeDiscountCoupon(Request $request){
+        // dd($request->all());
+        session()->forget('coupon_code');
+        return response()->json([
+            'status' => true,
+            'message' => 'coupon deleted'
+        ]);
     }
     
     public function thankYou($id){
