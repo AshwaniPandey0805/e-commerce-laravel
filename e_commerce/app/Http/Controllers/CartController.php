@@ -156,81 +156,46 @@ class CartController extends Controller
         session()->forget('url.intented');
         
         // Calculating shipping charge if coupon is applied
-        $subTotal = 0.0;
+        $amountAfterDiscount = 0.0;
+        $shippingCharge = 0.0;
+        $subtotalAmountString = Cart::subtotal('2','.',',');
+        $subTotal = floatval(str_replace(',', '', $subtotalAmountString));
+        $customerAddress = CustomerAddress::where('user_id', Auth::user()->id)->first();
+        $shippingAmount = ShippingCharge::select('charges')
+                            ->where('country_id', $customerAddress->country_id)
+                            ->first();
+        
         if(session()->has('coupon_code')){
             $coupon = DiscountCoupon::where('code', session()->get('coupon_code'))->first();
-            $amountAfterDiscount = 0.0;
-                $shippingChargeAmount = 0.0;
-                $subtotalAmountString = Cart::subtotal('2','.',',');
-                $subtotalAmountFloat = floatval(str_replace(',', '', $subtotalAmountString));
-                $discountAmmount = $coupon->discount_amount;
-                //check the type of
-                if($coupon->type == 'percent'){
-                    // apply dicount on sub-total amount
-                    $discount = ($subtotalAmountFloat * $discountAmmount) / 100;
-                    $amountAfterDiscount = $subtotalAmountFloat - $discount;
-                    // add ship charge
-                    $customerAddress = CustomerAddress::where('user_id', Auth::user()->id)->first();
-                    $shippingAmount = ShippingCharge::select('charges')
-                                        ->where('country_id', $customerAddress->country_id)
-                                        ->first();
-                    
-                    if($shippingAmount != null){
-                        
-                        $shippingCharge = $shippingAmount->charges * Cart::count();
-                        
-                        $subTotalAmount = $shippingCharge + $amountAfterDiscount;
-                        // dd($subTotalAmount, $amountAfterDiscount);
-                    } else {
-                        $shippingCharge = 0.0;
-                        $subTotalAmount = $shippingChargeAmount + $amountAfterDiscount;
-                    }
-                    
-                } else {
-                    $discount = $subtotalAmountFloat * $discountAmmount;
-                    $amountAfterDiscount = $subtotalAmountFloat - $discount;
-                    // add ship charge
-                    $customerAddress = CustomerAddress::where('user_id', Auth::user()->id)->first();
-                    $shippingAmount = ShippingCharge::select('charges')
-                                        ->where('country_id', $customerAddress->country_id)
-                                        ->first();
-                    
-                    if($shippingAmount != null){
-                        $shippingCharge = $shippingAmount->charges * Cart::count();
-                        $subTotalAmount = $shippingCharge + $amountAfterDiscount;
-                    }
-                    $subTotalAmount = $shippingChargeAmount + $amountAfterDiscount;
-                }
-            
-        } else {
-
-            $customerAddress = CustomerAddress::where('user_id' , Auth::user()->id)->first();
-            $shippingInfo = ShippingCharge::where('country_id', $customerAddress->country_id)->first();
-            if($shippingInfo != null ){
-                $shippingAmount = $shippingInfo->charges;
-                $shippingCharge = 0.0;
-                $count = 0;
-                if(Cart::count() > 0){
-                    $count = Cart::count();
-                    $shippingCharge = $count * $shippingAmount;
-                    
-                }
-                $totalString = Cart::subtotal(2, '.', ',');
-                $subTotal = floatval(str_replace(',', '', $totalString));
-                $subTotalAmount = $subTotal + $shippingCharge;    
+            $discountAmmount = $coupon->discount_amount;
+            if($coupon->type == 'percent'){
+                $discount = ($subTotal * $discountAmmount) / 100;
+                $amountAfterDiscount = $subTotal - $discount;
             } else {
-                $shippingAmount = 0.0;
-                $shippingCharge = 0.0;
+                $discount = $subTotal * $discountAmmount;
+                $amountAfterDiscount = $subTotal - $discount;
+            }
+            if($shippingAmount != null){
+                $shippingCharge = $shippingAmount->charges * Cart::count();
+                $subTotalAmount = $shippingCharge + $amountAfterDiscount;
+            } else {
+                $subTotalAmount = $shippingCharge + $amountAfterDiscount;
+            }
+        } else {
+            if($shippingAmount != null ){
                 $count = 0;
                 if(Cart::count() > 0){
                     $count = Cart::count();
-                    $shippingCharge = $count * $shippingAmount;
-                    
+                    $shippingCharge = $count * $shippingAmount->charges;
                 }
-                $totalString = Cart::subtotal(2, '.', ',');
-                $subTotal = floatval(str_replace(',', '', $totalString));
-                $subTotalAmount = $subTotal + $shippingCharge;
+            } else {
+                $count = 0;
+                if(Cart::count() > 0){
+                    $count = Cart::count();
+                    $shippingCharge = $count * 0.0;
+                }
             }
+            $subTotalAmount = $subTotal + $shippingCharge;
 
         }
         
@@ -358,20 +323,88 @@ class CartController extends Controller
 
     public function calculateShippingCharge(Request $request){
 
-
+        // 1. check shipping info is available in database
         $shippingInfo = ShippingCharge::where('country_id', $request->country_id)->first();
-        // dd($shippingInfo);
-        if($shippingInfo == null){
-            $shippingCharge = 0.0;
-            $totalString = Cart::subtotal(2, '.', ',');
-            $subTotal = floatval(str_replace(',', '', $totalString));
-            $subTotalAmount = $subTotal + $shippingCharge;
 
-            $user = Auth::user();
-            $customerAddress = CustomerAddress::where('user_id', $user->id)->first();
-            $customerAddress->country_id = $request->country_id;
-            $customerAddress->save();
+        // common
+        $shippingCharge = 0.0;
+        $amountAfterDiscount = 0.0;
+        $shippingChargeAmount = 0.0;
+
+        $user = Auth::user();
+        $totalString = Cart::subtotal(2, '.', ',');
+        $subTotal = floatval(str_replace(',', '', $totalString));
+        $customerAddress = CustomerAddress::where('user_id', $user->id)->first();
+        $customerAddress->country_id = $request->country_id;
+        $customerAddress->save();
+        $shippingAmount = ShippingCharge::select('charges')
+                            ->where('country_id', $customerAddress->country_id)
+                            ->first();
+
+        if($shippingInfo == null){
+            if(session()->has('coupon_code')){
+                $coupon = DiscountCoupon::where('code', session()->get('coupon_code'))->first();
+                $discountAmmount = $coupon->discount_amount;
+                if($coupon->type == 'percent'){
+                    $discount = ($subTotal * $discountAmmount) / 100;
+                    $amountAfterDiscount = $subTotal - $discount;
+                } else {
+                    $discount = $subTotal * $discountAmmount;
+                    $amountAfterDiscount = $subTotal - $discount;
+                }
+
+                if($shippingAmount != null){
+                    $shippingCharge = $shippingAmount->charges * Cart::count();
+                    $subTotalAmount = $shippingCharge + $amountAfterDiscount;
+                } else {
+                    $subTotalAmount = $shippingChargeAmount + $amountAfterDiscount; 
+                }
+            } else {
+                $subTotalAmount = $subTotal + $shippingCharge;
+            }
             
+            return response()->json([
+                'status' => true,
+                'data' => [
+                    'subTotalAmount' => number_format($subTotalAmount, 2, '.', ','),
+                    'shippingCharge' => number_format($shippingCharge, 2, '.', ','),
+                    'subTotal' => number_format($amountAfterDiscount, 2, '.', ',')
+                ],
+            ]);
+        }
+
+        if(session()->has('coupon_code')){
+            $coupon = DiscountCoupon::where('code', session()->get('coupon_code'))->first();
+            $discountAmmount = $coupon->discount_amount;
+            if($coupon->type == 'percent'){
+                $discount = ($subTotal * $discountAmmount) / 100;
+                $amountAfterDiscount = $subTotal - $discount;
+            } else {
+                $discount = $subTotal * $discountAmmount;
+                $amountAfterDiscount = $subTotal - $discount;
+            }
+            if($shippingAmount != null){
+                $shippingCharge = $shippingAmount->charges * Cart::count();
+                $subTotalAmount = $shippingCharge + $amountAfterDiscount;
+            } else {
+                $subTotalAmount = $shippingChargeAmount + $amountAfterDiscount; 
+            }
+            return response()->json([
+                'status' => true,
+                'data' => [
+                    'subTotalAmount' => number_format($subTotalAmount, 2, '.', ','),
+                    'shippingCharge' => number_format($shippingCharge, 2, '.', ','),
+                    'subTotal' => number_format($amountAfterDiscount, 2, '.', ',')
+                ],
+            ]);
+        } else {
+            $shippingAmount = $shippingInfo->charges;
+            $count = 0;
+            if(Cart::count() > 0){
+                $count = Cart::count();
+                $shippingCharge = $count * $shippingAmount;
+            }
+            $subTotalAmount = $subTotal + $shippingCharge;
             return response()->json([
                 'status' => true,
                 'data' => [
@@ -381,120 +414,6 @@ class CartController extends Controller
                 ],
             ]);
         }
-        if(session()->has('coupon_code')){
-            $coupon = DiscountCoupon::where('code', session()->get('coupon_code'))->first();
-            $amountAfterDiscount = 0.0;
-                $shippingChargeAmount = 0.0;
-                $subtotalAmountString = Cart::subtotal('2','.',',');
-                $subtotalAmountFloat = floatval(str_replace(',', '', $subtotalAmountString));
-                $discountAmmount = $coupon->discount_amount;
-                //check the type of
-                if($coupon->type == 'percent'){
-                    // apply dicount on sub-total amount
-                    $discount = ($subtotalAmountFloat * $discountAmmount) / 100;
-                    $amountAfterDiscount = $subtotalAmountFloat - $discount;
-                    $user = Auth::user();
-                    $customerAddress = CustomerAddress::where('user_id', $user->id)->first();
-                    $customerAddress->country_id = $request->country_id;
-                    $customerAddress->save();
-                    // add ship charge
-                    $customerAddress = CustomerAddress::where('user_id', Auth::user()->id)->first();
-                    $shippingAmount = ShippingCharge::select('charges')
-                                        ->where('country_id', $customerAddress->country_id)
-                                        ->first();
-                    if($shippingAmount != null){
-                        
-                        $shippingCharge = $shippingAmount->charges * Cart::count();
-                        
-                        $subTotalAmount = $shippingCharge + $amountAfterDiscount;
-                        // dd($subTotalAmount, $amountAfterDiscount);
-                    } else {
-                        $shippingCharge = 0.0;
-                        $subTotalAmount = $shippingChargeAmount + $amountAfterDiscount; 
-                    }
-
-                    // dd()
-                    
-                    // $subTotalAmount = $shippingChargeAmount + $amountAfterDiscount;
-                } else {
-                    $discount = $subtotalAmountFloat * $discountAmmount;
-                    $amountAfterDiscount = $subtotalAmountFloat - $discount;
-                    // add ship charge
-                    $customerAddress = CustomerAddress::where('user_id', Auth::user()->id)->first();
-                    $shippingAmount = ShippingCharge::select('charges')
-                                        ->where('country_id', $customerAddress->country_id)
-                                        ->first();
-                    
-                    if($shippingAmount != null){
-                        $shippingCharge = $shippingAmount->charges * Cart::count();
-                        $subTotalAmount = $shippingCharge + $amountAfterDiscount;
-                    }
-                    $subTotalAmount = $shippingChargeAmount + $amountAfterDiscount;
-                }
-
-                return response()->json([
-                    'status' => true,
-                    'data' => [
-                        'subTotalAmount' => number_format($subTotalAmount, 2, '.', ','),
-                        'shippingCharge' => number_format($shippingCharge, 2, '.', ','),
-                        'subTotal' => number_format($amountAfterDiscount, 2, '.', ',')
-                    ],
-                ]);
-            
-        } else {
-        
-            $user = Auth::user();
-            $customerAddress = CustomerAddress::where('user_id', $user->id)->first();
-            $customerAddress->country_id = $request->country_id;
-            $customerAddress->save();
-
-            if($shippingInfo != null){
-                $shippingAmount = $shippingInfo->charges;
-
-                // calculation
-                $shippingCharge = 0.0;
-                $count = 0;
-                if(Cart::count() > 0){
-                    $count = Cart::count();
-                    $shippingCharge = $count * $shippingAmount;
-                    
-                }
-                $totalString = Cart::subtotal(2, '.', ',');
-                $subTotal = floatval(str_replace(',', '', $totalString));
-                $subTotalAmount = $subTotal + $shippingCharge;
-                
-                return response()->json([
-                    'status' => true,
-                    'data' => [
-                        'subTotalAmount' => $subTotalAmount,
-                        'shippingCharge' => $shippingCharge
-                    ],
-                ]);
-                
-            } else {
-
-                $shippingCharge = 0.0;
-                $count = 0;
-                if(Cart::count() > 0){
-                    $count = Cart::count();
-                    $shippingCharge = $count * 20.0;
-                    
-                }
-                $totalString = Cart::subtotal(2, '.', ',');
-                $subTotal = floatval(str_replace(',', '', $totalString));
-                $subTotalAmount = $subTotal + $shippingCharge;
-                
-                return response()->json([
-                    'status' => true,
-                    'data' => [
-                        'subTotalAmount' => $subTotalAmount,
-                        'shippingCharge' => $shippingCharge
-                    ],
-                ]);
-            }
-
-        }
-        
     }
 
     public function applyDiscountCoupon(Request $request){
@@ -502,6 +421,14 @@ class CartController extends Controller
         session()->put('coupon_code', $request->coupon_code);
         if(!empty($coupon)){
             
+            $amountAfterDiscount = 0.0;
+            $shippingChargeAmount = 0.0;
+            $subtotalAmountString = Cart::subtotal('2','.',',');
+            $subtotalAmountFloat = floatval(str_replace(',', '', $subtotalAmountString));
+            $shippingAmount = ShippingCharge::select('charges')
+                                ->where('country_id', $request->country_id)
+                                ->first();
+
             // 1 check the validity of applied coupon
             $now = Carbon::now();
             $start_at = Carbon::parse($coupon->start_at);
@@ -522,51 +449,29 @@ class CartController extends Controller
                     'errors' => ['applied-coupon' => 'Coupon is expired']
                 ]);
             }
-            // dd($coupon);
             // check the status
             if($coupon->status == 1 ){
-                $amountAfterDiscount = 0.0;
-                $shippingChargeAmount = 0.0;
-                $subtotalAmountString = Cart::subtotal('2','.',',');
-                $subtotalAmountFloat = floatval(str_replace(',', '', $subtotalAmountString));
                 $discountAmmount = $coupon->discount_amount;
                 //check the type of
                 if($coupon->type == 'percent'){
-                    // apply dicount on sub-total amount
                     $discount = ($subtotalAmountFloat * $discountAmmount) / 100;
                     $amountAfterDiscount = $subtotalAmountFloat - $discount;
-                    // add ship charge
-                    $shippingAmount = ShippingCharge::select('charges')
-                                        ->where('country_id', $request->country_id)
-                                        ->first();
-                    
-                    if($shippingAmount != null){
-                        $shippingChargeAmount = $shippingAmount->charges;
-                        $subTotal = $shippingChargeAmount + $amountAfterDiscount;
-                    }
-                    
-                    $subTotal = $shippingChargeAmount + $amountAfterDiscount;
                 } else {
                     $discount = $subtotalAmountFloat * $discountAmmount;
                     $amountAfterDiscount = $subtotalAmountFloat - $discount;
-                    // add ship charge
-                    $shippingAmount = ShippingCharge::select('charges')
-                                        ->where('country_id', $request->country_id)
-                                        ->first();
-                    
-                    if($shippingAmount != null){
-                        $shippingChargeAmount = $shippingAmount->charges;
-                        $subTotal = $shippingChargeAmount + $amountAfterDiscount;
-                    }
                 }
-
-                // $user = Auth::user();
-
+                // add ship amount
+                if($shippingAmount != null){
+                    $shippingChargeAmount = $shippingAmount->charges;
+                    $subTotal = $shippingChargeAmount + $amountAfterDiscount;
+                } else {
+                    $subTotal = $shippingChargeAmount + $amountAfterDiscount;
+                }
                 return response()->json([
                     'status' => true,
-                    'shipping_amount' => number_format($shippingChargeAmount,2,'.',','),
-                    'amount_after_discount' => number_format($amountAfterDiscount,2,'.',','),
-                    'sub_total_amount' => number_format($subTotal,2,'.',',')
+                    'shipping_amount' => number_format($shippingChargeAmount, 2, '.', ','),
+                    'amount_after_discount' => number_format($amountAfterDiscount, 2, '.', ','),
+                    'sub_total_amount' => number_format($subTotal, 2, '.', ',')
                 ]); 
                 
             } else {

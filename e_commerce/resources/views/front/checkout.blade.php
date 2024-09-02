@@ -127,7 +127,7 @@
                             @endif
                             <div class="d-flex justify-content-between summery-end">
                                 <div class="h6"><strong>Subtotal</strong></div>
-                                @if ($subTotal > 0)
+                                @if ($subTotal >= 0.0)
                                     <div class="h6"><strong id="total_amount" >$ {{ number_format($subTotal, 2, '.', ',') }} </strong></div>    
                                 @else
                                     <div class="h6"><strong id="total_amount" >$ {{ Cart::subtotal() }} </strong></div>
@@ -146,7 +146,12 @@
                     <div class="input-group apply-coupan mt-4">
                         <input type="text" id="applied-coupon" @if (session()->has('coupon_code')) value="{{ session()->get('coupon_code') }}"
                         @endif placeholder="Coupon Code" class="form-control">
-                        <button class="btn btn-dark" type="button" id="button-addon2">Apply Coupon</button>
+                        @if (session()->has('coupon_code'))
+                            <button disabled class="btn btn-dark"  type="button" id="button-addon2">Apply Coupon</button>    
+                        @else
+                            <button class="btn btn-dark"  type="button" id="button-addon2">Apply Coupon</button>    
+                        @endif
+                        
                     </div> 
                     <div class="mt-4" >
                         <p id="coupon-error" ></p>
@@ -229,7 +234,7 @@
                         }
                     } else {
 
-                        $("#total").html("$ "+response['amount_after_discount']);
+                        $("#total_amount").html("$ "+response['amount_after_discount']);
                         $("#shipping_amount").html("$ "+response['shipping_amount']);
                         $("#sub_total_amount").html("$ "+response['sub_total_amount'])
                     }
