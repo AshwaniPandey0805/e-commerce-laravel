@@ -5,6 +5,7 @@ use App\Http\Controllers\admin\BrandController;
 use App\Http\Controllers\admin\CategoryController;
 use App\Http\Controllers\admin\DiscountCouponController;
 use App\Http\Controllers\admin\HomeController;
+use App\Http\Controllers\admin\OrderController;
 use App\Http\Controllers\admin\ProductController;
 use App\Http\Controllers\admin\ProductImageController;
 use App\Http\Controllers\admin\SubCategoryController;
@@ -142,6 +143,10 @@ Route::group(['prefix' => 'admin'], function(){
         Route::get('/coupon/{id}/edit', [DiscountCouponController::class, 'edit'])->name('coupon.edit');
         Route::post('/coupon/{id}/update', [DiscountCouponController::class, 'update'])->name('coupon.update');
         Route::any('/coupon/{id}/delete', [DiscountCouponController::class, 'delete'])->name('coupon.delete');
+
+        // Order Routes
+        Route::get('/order/list',[OrderController::class, 'index'])->name('order.index');
+        Route::get('/order/{id}/detail',[OrderController::class, 'detail'])->name('order.detail');
 
         // Get Sub Category data
         Route::post('/product/sub-category',[ProductSubCategoryController::class, 'getSubCategory'])->name('product.SubCategory');
