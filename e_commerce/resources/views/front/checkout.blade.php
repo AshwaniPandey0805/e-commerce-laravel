@@ -155,12 +155,11 @@
                     <div class="mt-4" >
                         <p id="coupon-error" ></p>
                     </div >
-                    @if (session()->has('coupon_code'))
-                        <div id="coupon_list" class="mt-4">
-                            <strong>{{ session()->get('coupon_code') }}</strong>
-                            <a href="" class="btn btn-sm btn-danger" id="remove_coupon" ><i class="fa fa-times"></i></a>
-                        </div>    
-                    @endif
+                    <div id="applied-coupon-list" >
+                        {!! $html !!}
+                    </div>   
+                        
+                    
                     
                     
                     <div class="card payment-form ">    
@@ -244,8 +243,13 @@
                         $("#total_amount").html("$ "+response['amount_after_discount']);
                         $("#shipping_amount").html("$ "+response['shipping_amount']);
                         $("#sub_total_amount").html("$ "+response['sub_total_amount'])
+                        if(response['html']){
+                            $("#applied-coupon-list").html(response['html']);    
+                        } else {
+                            $("#applied-coupon-list").html('');
+                        }
+                        
                         // Reload the current page
-                        window.location.href = "{{ route('front.checkout') }}"
                         
                         
                     }
@@ -256,27 +260,62 @@
             })
         });
 
-       $("#remove_coupon").click(function(event){
+         
+        $("#remove_coupon").click(function(event){
             event.preventDefault();
             $.ajax({
-                url : "{{ route('front.removeDiscountCoupun') }}",
-                type : 'post',
-                data : {
-                    'country_code' : $("#country").val()
-                },
-                dataType : 'json',
-                success : function ( response ){
-                    if(response['status'] == true){
-                        
-                        // window.location.reload();
-                        window.location.href = "{{ route('front.checkout') }}"
+                    url : "{{ route('front.removeDiscountCoupun') }}",
+                    type : 'get',
+                    data : {
+                        'country_code' : $("#country").val()
+                    },
+                    dataType : 'json',
+                    success : function ( response ){
+                        if(response['status'] == true){
+                            window.location.reload();
+                        }
+                    },
+                    error : function ( error ){
+                        console.log('errors', error.message);
                     }
-                },
-                error : function ( error ){
-                    console.log('errors', error.message);
-                }
+                });
             });
-       });
+       
+
+       $("#country").change(function(){
+           console.log('clicked');
+           var countryId = $(this).val(); // getting country id
+           $.ajax({
+               url : "{{route('front.calculateShippingCharge')}}",
+               type : 'get',
+               data : { country_id : countryId },
+               dataType : 'json',
+               success : function ( response ){
+                   // console.log(response);
+                   var data = response['data'];
+                   var subTotalAmount = data['subTotalAmount'];
+                   var shippingCharge = data['shippingCharge'];
+                   var subTotal = data['subTotal'];
+                   
+
+                   $("#shipping_amount").html("$ "+shippingCharge)
+                   $("#sub_total_amount").html("$ "+subTotalAmount)
+                   $("#total_amount").html("$ "+subTotal)
+                   if(response['html']){
+                        $("#applied-coupon-list").html(response['html']);    
+                    } else {
+                        $("#applied-coupon-list").html('');
+                    }
+                   
+                   
+               },
+               error : function ( error ){
+                   console.log(error.message());
+                   
+               }
+           })
+           
+       })
 
         $("#checkoutForm").submit(function( event ){
             event.preventDefault();
@@ -402,35 +441,6 @@
             });
         });
 
-        $("#country").change(function(){
-            console.log('clicked');
-            var countryId = $(this).val(); // getting country id
-            $.ajax({
-                url : "{{route('front.calculateShippingCharge')}}",
-                type : 'get',
-                data : { country_id : countryId },
-                dataType : 'json',
-                success : function ( response ){
-                    // console.log(response);
-                    var data = response['data'];
-                    var subTotalAmount = data['subTotalAmount'];
-                    var shippingCharge = data['shippingCharge'];
-                    var subTotal = data['subTotal'];
-                    
-
-                    $("#shipping_amount").html("$ "+shippingCharge)
-                    $("#sub_total_amount").html("$ "+subTotalAmount)
-                    $("#total_amount").html("$ "+subTotal)
-                    
-                    
-                },
-                error : function ( error ){
-                    console.log(error.message());
-                    
-                }
-            })
-            
-        })
 
     </script>
 @endsection

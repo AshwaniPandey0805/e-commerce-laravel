@@ -158,6 +158,7 @@ class CartController extends Controller
         // Calculating shipping charge if coupon is applied
         $amountAfterDiscount = 0.0;
         $shippingCharge = 0.0;
+        $html = '';
         $subtotalAmountString = Cart::subtotal('2','.',',');
         $subTotal = floatval(str_replace(',', '', $subtotalAmountString));
         $customerAddress = CustomerAddress::where('user_id', Auth::user()->id)->first();
@@ -181,6 +182,10 @@ class CartController extends Controller
             } else {
                 $subTotalAmount = $shippingCharge + $amountAfterDiscount;
             }
+            $html = '<div id="coupon_list" class="mt-4">
+                            <strong>'.session()->get('coupon_code').'</strong>
+                            <a href="" class="btn btn-sm btn-danger" id="remove_coupon" ><i class="fa fa-times"></i></a>
+                        </div>';
         } else {
             if($shippingAmount != null ){
                 $count = 0;
@@ -206,6 +211,7 @@ class CartController extends Controller
         $data['customerAddress'] = $customerAddress;
         $data['shippingCharge'] = $shippingCharge;
         $data['subTotalAmount'] = $subTotalAmount;
+        $data['html'] = $html;
          
         return view('front.checkout', $data);
     }
@@ -309,17 +315,6 @@ class CartController extends Controller
                 $order->state = $request->state;
                 $order->zip_code = $request->zip;
                 $order->save();
-
-                // Manipluate coupoun usage 
-
-                if(isset($order->coupon_code)){
-                    if(isset($coupon)){
-                        $coupon->max_uses -= 1;
-                        $coupon->save();
-                    }
-                }
-
-                
             }
             // save ordered_item details
             foreach (Cart::content() as $item) {
@@ -396,13 +391,19 @@ class CartController extends Controller
                 $amountAfterDiscount = $subTotal; 
                 $subTotalAmount = $subTotal + $shippingCharge;
             }
+
+            $html = '<div id="coupon_list" class="mt-4">
+                            <strong>'.session()->get('coupon_code').'</strong>
+                            <a href="" class="btn btn-sm btn-danger" id="remove_coupon" ><i class="fa fa-times"></i></a>
+                        </div>';
             
             return response()->json([
                 'status' => true,
                 'data' => [
                     'subTotalAmount' => number_format($subTotalAmount, 2, '.', ','),
                     'shippingCharge' => number_format($shippingCharge, 2, '.', ','),
-                    'subTotal' => number_format($amountAfterDiscount, 2, '.', ',')
+                    'subTotal' => number_format($amountAfterDiscount, 2, '.', ','),
+                    'html' => $html
                 ],
             ]);
         }
@@ -423,12 +424,17 @@ class CartController extends Controller
             } else {
                 $subTotalAmount = $shippingChargeAmount + $amountAfterDiscount; 
             }
+            $html = '<div id="coupon_list" class="mt-4">
+                            <strong>'.session()->get('coupon_code').'</strong>
+                            <a href="" class="btn btn-sm btn-danger" id="remove_coupon" ><i class="fa fa-times"></i></a>
+                        </div>';
             return response()->json([
                 'status' => true,
                 'data' => [
                     'subTotalAmount' => number_format($subTotalAmount, 2, '.', ','),
                     'shippingCharge' => number_format($shippingCharge, 2, '.', ','),
-                    'subTotal' => number_format($amountAfterDiscount, 2, '.', ',')
+                    'subTotal' => number_format($amountAfterDiscount, 2, '.', ','),
+                    'html' => $html
                 ],
             ]);
         } else {
@@ -453,7 +459,7 @@ class CartController extends Controller
     public function applyDiscountCoupon(Request $request){
         
         $coupon = DiscountCoupon::where('code', $request->coupon_code)->first();
-        session()->put('coupon_code', $request->coupon_code);
+        
         if(!empty($coupon)){
             
             $amountAfterDiscount = 0.0;
@@ -484,6 +490,44 @@ class CartController extends Controller
                     'errors' => ['applied-coupon' => 'Coupon is expired']
                 ]);
             }
+
+            // check the limit max_uses for the user can use the coupon 
+            $coupon_uses = Order::where('coupon_code', $coupon->code)
+                                ->where('user_id', Auth::user()->id )
+                                ->count();
+            if($coupon->max_uses > 0){
+                if($coupon_uses > $coupon->max_uses){
+                    return response()->json([
+                        'status' => false,
+                        'errors' => ['applied-coupon' => Auth::user()->name.' exceeded the coupon usage limit']
+                    ]);
+                }
+            }
+
+            // check the limit number of users can use the coupon
+            $max_users_coupon = Order::where('coupon_code', $coupon->code)->count();
+            if($coupon->max_user_uses > 0){
+                if($max_users_coupon > $coupon->max_user_uses ){
+                    return response()->json([
+                        'status' => false,
+                        'errors' => ['applied-coupon' => 'Coupon usage limit exceeded']
+                    ]);
+                }
+            }
+              
+            // check for minimum amount 
+            $min_amount = $coupon->min_amount;
+            if($subtotalAmountFloat > 0){
+                if($subtotalAmountFloat < $min_amount ){
+                    return response()->json([
+                        'status' => false,
+                        'errors' => ['applied-coupon' => 'Minimum amount must be $'.$coupon->min_amount.' to apply this coupon']
+                    ]);
+                }
+            }
+            
+            //  After All validation apply copoun
+            session()->put('coupon_code', $request->coupon_code);
             // check the status
             if($coupon->status == 1 ){
                 
@@ -505,13 +549,17 @@ class CartController extends Controller
                 } else {
                     $subTotal = $shippingChargeAmount + $amountAfterDiscount;
                 }
-                // dd($amountAfterDiscount, $subTotal, $subtotalAmountFloat);
+                
+                $html = '<div id="coupon_list" class="mt-4">
+                            <strong>'.session()->get('coupon_code').'</strong>
+                            <a href="" class="btn btn-sm btn-danger" id="remove_coupon" ><i class="fa fa-times"></i></a>
+                        </div>';
                 return response()->json([
                     'status' => true,
                     'shipping_amount' => number_format($shippingChargeAmount, 2, '.', ','),
                     'amount_after_discount' => number_format($amountAfterDiscount, 2, '.', ','),
                     'sub_total_amount' => number_format($subTotal, 2, '.', ','),
-                    'coupon_code' => (session()->has('coupon_code')) ? session()->get('coupon_code') : ''
+                    'html' => $html
                 ]); 
                 
             } else {
@@ -536,7 +584,7 @@ class CartController extends Controller
         session()->forget('coupon_code');
         return response()->json([
             'status' => true,
-            'message' => 'coupon deleted'
+            'message' => 'coupon deleted',
         ]);
     }
     
