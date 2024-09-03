@@ -147,6 +147,7 @@ Route::group(['prefix' => 'admin'], function(){
         // Order Routes
         Route::get('/order/list',[OrderController::class, 'index'])->name('order.index');
         Route::get('/order/{id}/detail',[OrderController::class, 'detail'])->name('order.detail');
+        Route::post('/order/{id}/update',[OrderController::class, 'update'])->name('order.update');
 
         // Get Sub Category data
         Route::post('/product/sub-category',[ProductSubCategoryController::class, 'getSubCategory'])->name('product.SubCategory');

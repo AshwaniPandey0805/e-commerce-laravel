@@ -65,6 +65,9 @@
                             </table>
                         </div>
                     </div>
+                    <div class="card-footer clearfix">
+                        {{ $orders->links() }}
+                    </div>
                 </div>
             </div>
         </div>

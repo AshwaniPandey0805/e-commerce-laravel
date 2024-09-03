@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 @section('content')
     <!-- Content Header (Page header) -->
@@ -134,8 +133,13 @@
                                     <option {{ ($order->status == 'cancelled') ? 'selected' : '' }}  value="cancelled">Cancelled</option>
                                 </select>
                             </div>
+                            <div class="mb-3" >
+                                <label for="shipped_date">Shipping Date</label>
+                                <input autocomplete="off" type="text" class="form-control"  id="shipped_date" name="shipped_date" placeholder="Select Shipping Date" >
+                                <p></p>
+                            </div>
                             <div class="mb-3">
-                                <button class="btn btn-primary">Update</button>
+                                <button class="btn btn-primary" id="update_order_detail" >Update</button>
                             </div>
                         </div>
                     </div>
@@ -162,4 +166,44 @@
 @endsection
 
 @section('customeJS')
+    <script>
+
+        $(document).ready(function(){
+            $('#shipped_date').datetimepicker({
+                // options here
+                format:'Y-m-d H:i:s',
+            });
+            
+        });
+
+        $("#update_order_detail").click(function(){
+            $.ajax({
+                url : "{{route('order.update',$order->id)}}",
+                type : "post",
+                data : { 
+                    order_status : $("#status").val(),
+                    shipped_date  : $("#shipped_date").val() 
+                },
+                dataType : "json",
+                success : function ( response ){
+                    var error = response['error'];
+                    console.log(response);
+                    if(response['status'] ==  false){
+                        if(error['shipped_date']){
+                            $("#shipped_date").addClass('is-invalid').siblings('p').addClass('invalid-feedback').html(error['shipped_date'])    
+                        } else {
+                            $("#shipped_date").removeClass('is-invalid').siblings('p').removeClass('invalid-feedback').html('');
+                        }
+                    } else {
+                        var id = response['order_id'];
+                        window.location.href = `{{ url('/admin/order/${id}/detail') }}`;
+                    }
+                },
+                error : function ( error ){
+                    console.log(error.message);
+                }
+
+            })
+        })
+    </script>
 @endsection
