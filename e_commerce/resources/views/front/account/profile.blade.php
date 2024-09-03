@@ -4,7 +4,12 @@
     <div class="container">
         <div class="light-font">
             <ol class="breadcrumb primary-color mb-0">
-                <li class="breadcrumb-item"><a class="white-text" href="#">My Account</a></li>
+                @if (Auth::check())
+                    <li class="breadcrumb-item"><a class="white-text" href="{{ route('account.profile') }}">My Account</a></li>    
+                @else
+                    <li class="breadcrumb-item"><a class="white-text" href="{{ route('front.login') }}">My Account</a></li>
+                @endif
+                
                 <li class="breadcrumb-item">Settings</li>
             </ol>
         </div>

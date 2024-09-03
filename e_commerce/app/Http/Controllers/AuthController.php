@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -82,7 +84,27 @@ class AuthController extends Controller
     }
 
     public function profile(){
+        
         return view('front.account.profile');
+    }
+
+    public function order(){
+        $orders = Order::where('user_id', Auth::user()->id )->orderby('created_at', 'DESC')->get();
+
+        $data['orders'] = $orders;
+        return view('front.account.myOrder', $data);
+    }
+
+    public function orderDetail($id){
+        $order = Order::where('id', $id )->first();
+        // dd($order);
+        $orderItems = OrderItem::where('order_id', $order->id)->with('products.product_images')->get();
+        // dd($orderItems);
+        $data['order'] = $order;
+        $data['orderItems'] = $orderItems;
+
+
+        return view('front.account.orderDetail', $data);
     }
 
     public function logout(){
