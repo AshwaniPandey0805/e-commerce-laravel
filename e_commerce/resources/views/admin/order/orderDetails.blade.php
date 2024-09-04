@@ -147,13 +147,14 @@
                         <div class="card-body">
                             <h2 class="h4 mb-3">Send Inovice Email</h2>
                             <div class="mb-3">
-                                <select name="status" id="status" class="form-control">
-                                    <option value="">Customer</option>                                                
-                                    <option value="">Admin</option>
+                                <select name="status" id="send_invoice_email" class="form-control">
+                                    <option value="customer">Customer</option>                                                
+                                    <option value="admin">Admin</option>
                                 </select>
+                                <p></p>
                             </div>
                             <div class="mb-3">
-                                <button class="btn btn-primary">Send</button>
+                                <button id="send_invoice_email_btn" class="btn btn-primary">Send</button>
                             </div>
                         </div>
                     </div>
@@ -204,6 +205,38 @@
                 }
 
             })
-        })
+        });
+
+        $("#send_invoice_email_btn").click(function(){
+            $.ajax({
+                url : "{{route('order.sendInvoiceMail',$order->id)}}",
+                type : "post",
+                data : { 
+                    send_invoice_email : $("#send_invoice_email").val(), 
+                },
+                dataType : "json",
+                success : function ( response ){
+                    var error = response['error'];
+                    console.log(response);
+                    if(response['status'] ==  false){
+                        if(error['send_invoice_email']){
+                            $("#send_invoice_email").addClass('is-invalid').siblings('p').addClass('invalid-feedback').html(error['send_invoice_email'])    
+                        } else {
+                            $("#send_invoice_email").removeClass('is-invalid').siblings('p').removeClass('invalid-feedback').html('');
+                        }
+                    } else {
+                        var id = response['order_id'];
+                        window.location.href = `{{ url('/admin/order/${id}/detail') }}`;
+                    }
+                },
+                error : function ( error ){
+                    console.log(error.message);
+                }
+
+            })
+        });
+
+
+
     </script>
 @endsection

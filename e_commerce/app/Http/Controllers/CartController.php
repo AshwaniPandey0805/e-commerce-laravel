@@ -331,13 +331,15 @@ class CartController extends Controller
             session()->forget('coupon_code');
             $request->session()->flash('success', 'Order saved successfully');
             Cart::destroy();
+            //send email to user
+            sendOrderEmail($order->id, 'customer');
             return response()->json([
                 'status' => true,
                 'message' => 'Order saved successfully',
                 'order_id' => $order->id,
             ]);
 
-            //
+            
 
         } else {
             return response()->json([

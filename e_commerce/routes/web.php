@@ -36,6 +36,11 @@ use Illuminate\Support\Str;
 // Route::get('/', function () {
 //     return view('welcome');
 // });
+
+// Route::get('/test-mail', function(){
+//     sendOrderEmail(17);
+// });
+
 Route::get('/',[FrontController::class,'index'])->name('front.index');
 Route::get('/shop/{categorySlug?}/{subcategorySlug?}', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/product/{slug}',[ShopController::class,'product'])->name('shop.product');
@@ -148,6 +153,7 @@ Route::group(['prefix' => 'admin'], function(){
         Route::get('/order/list',[OrderController::class, 'index'])->name('order.index');
         Route::get('/order/{id}/detail',[OrderController::class, 'detail'])->name('order.detail');
         Route::post('/order/{id}/update',[OrderController::class, 'update'])->name('order.update');
+        Route::post('/order/{id}/send-invoice-mail',[OrderController::class, 'sendInvoiceMail'])->name('order.sendInvoiceMail');
 
         // Get Sub Category data
         Route::post('/product/sub-category',[ProductSubCategoryController::class, 'getSubCategory'])->name('product.SubCategory');

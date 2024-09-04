@@ -57,4 +57,20 @@ class OrderController extends Controller
             'order_id' => $order->id
         ]);
     }
+
+    public function sendInvoiceMail($id, Request $request){
+        
+        if(!isset($request->send_invoice_email)){
+            return response()->json([
+                'status' => false,
+                'error' => ['send_invoice_email' => 'Please select the option']
+            ]);
+        }
+        sendOrderEmail($id, $request->send_invoice_email);
+        return response()->json([
+            'status' => true,
+            'message' => 'Invoice main sended',
+            'order_id' => $id
+        ]);
+    }
 }
