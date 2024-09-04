@@ -16,6 +16,7 @@ use App\Http\Controllers\FrontController;
 use App\Http\Controllers\ProductSubCategoryController;
 use App\Http\Controllers\ShippingController;
 use App\Http\Controllers\ShopController;
+use App\Http\Controllers\wishListController;
 use App\Models\TempImage;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Http\Request;
@@ -53,6 +54,10 @@ Route::post('/checkout-process',[CartController::class, 'checkoutProcess'])->nam
 Route::get('/shipping-charge/calculate', [CartController::class, 'calculateShippingCharge'])->name('front.calculateShippingCharge');
 Route::post('/apply-coupon', [CartController::class, 'applyDiscountCoupon'])->name('front.applyDiscountCoupun');
 Route::get('/remove-coupon', [CartController::class, 'removeDiscountCoupon'])->name('front.removeDiscountCoupun');
+Route::post('/wish-list/store', [wishListController::class, 'store'])->name('account.wishlist.store');
+
+
+
 Route::get('/thank/{id}',[CartController::class, 'thankYou'])->name('front.thankYou');
 
 
@@ -70,6 +75,9 @@ Route::group(['prefix' => 'account'], function(){
             Route::get('/profile',[AuthController::class, 'profile'])->name('account.profile');
             Route::get('/order',[AuthController::class, 'order'])->name('account.order');
             Route::get('/order-detail/{id}',[AuthController::class, 'orderDetail'])->name('account.orderDetail');
+            
+            Route::get('/wish-list/list', [wishListController::class, 'index'])->name('account.wishlist.index');
+            Route::post('/wish-list/delete', [wishListController::class, 'delete'])->name('account.wishlist.delete');
             Route::get('/logout',[AuthController::class, 'logout'])->name('account.logout');
     });
 });

@@ -15,6 +15,7 @@
 		<link rel="stylesheet" href="{{ asset('admin-assets/css/datetimepicker.css') }}">
 		<link rel="stylesheet" href="{{ asset('admin-assets/plugins/summernote/summernote.min.css') }}">
 		<link rel="stylesheet" href="{{ asset('admin-assets/plugins/select2/css/select2.min.css') }}">
+		<link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@4/dark.css" rel="stylesheet">
 		<meta name="csrf-token" content="{{ csrf_token() }}" >
 	</head>
 	<body class="hold-transition sidebar-mini">
@@ -94,6 +95,7 @@
 		<script src="{{ asset('admin-assets/plugins/dropzone/min/dropzone.min.js') }}"></script>
 		<script src="{{ asset('admin-assets/plugins/summernote/summernote.min.js') }}"></script>
 		<script src="{{ asset('admin-assets/plugins/select2/js/select2.full.min.js') }}"></script>
+		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
 		<script type="text/javascript">
 			$.ajaxSetup({
 				headers: {
@@ -107,9 +109,53 @@
 				});
 			});
 
-			
+			// add to wish list script
+			function addToWishList(id){
+				console.log(id);
+				$.ajax({
+					url : "{{route('wishlist.store')}}",
+					type : 'POST',
+					data : { id : id },
+					dataType : 'json',
+					success : function ( response ){
+						console.log(response);
+					}, 
+					error : function ( error ){
+						console.log(error.message);
+					}
+				});
+			}
 
 		</script>
+			{{-- <script>
+				// add to wish list script
+					function addToWishList(id){
+						console.log(id);
+						$.ajax({
+							url : "{{route('account.wishlist.store')}}",
+							type : 'POST',
+							data : { id : id },
+							dataType : 'json',
+							success : function ( response ){
+								console.log(response['status']);
+
+								if(response['status'] == true){
+									console.log('sasaasa')
+									Swal.fire({
+										position: "top-end",
+										icon: "success",
+										title: `${response['product_name']} is added to wish list`,
+										showConfirmButton: false,
+										timer: 1500
+									});
+								}
+							}, 
+							error : function ( error ){
+								console.log(error.message);
+							}
+						});
+					}
+			</script> --}}
 
 		@yield('customeJS')
        
