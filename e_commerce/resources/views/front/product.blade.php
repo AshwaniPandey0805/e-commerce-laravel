@@ -54,13 +54,20 @@
                         <small class="pt-1">(99 Reviews)</small>
                     </div>
                     @if ($product->compare_price > 0)
-                        <h2 class="price text-secondary"><del>${{ $product->compare_price }}</del></h2>    
+                        <h2 class="price text-secondary"><del>${{ number_format($product->compare_price, 2) }}</del></h2>    
                     @endif
                     
-                    <h2 class="price ">${{ $product->price }}</h2>
+                    <h2 class="price ">${{ number_format($product->price, 2) }}</h2>
+
+
 
                     {!! $product->short_description !!}
-                    <a href="javascript:void(0);" onclick="addToCart({{ $product->id }})" class="btn btn-dark"><i class="fas fa-shopping-cart"></i> &nbsp;ADD TO CART</a>
+
+                    @if ($product->qty > 0)
+                        <a href="javascript:void(0);" onclick="addToCart({{ $product->id }})" class="btn btn-dark"><i class="fas fa-shopping-cart"></i> &nbsp;ADD TO CART</a>
+                    @else
+                        <span class="badge bg-danger mt-2 p-2">Out of Stock</span>
+                    @endif
                 </div>
             </div>
 

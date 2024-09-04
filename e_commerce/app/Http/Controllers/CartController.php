@@ -318,6 +318,7 @@ class CartController extends Controller
             }
             // save ordered_item details
             foreach (Cart::content() as $item) {
+
                 $orderItem = new OrderItem();
                 $orderItem->order_id = $order->id;
                 $orderItem->product_id = $item->id;
@@ -326,7 +327,20 @@ class CartController extends Controller
                 $orderItem->price = $item->price;
                 $orderItem->total = ($item->price * $item->qty);
                 $orderItem->save();
+
+                // reduce the qty from Product Table
+                $product = product::where('id', $item->id)->first();
+                if(isset($product)){
+                    if($product->qty > 0){
+                        $productPreviousQty = $product->qty;
+                        $productNewQty = ($productPreviousQty - $item->qty);
+                        $product->qty = $productNewQty;
+                        $product->save();
+                    }
+                }
             }
+
+            
 
             session()->forget('coupon_code');
             $request->session()->flash('success', 'Order saved successfully');

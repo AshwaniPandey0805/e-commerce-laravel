@@ -33,27 +33,36 @@
                                 <div class="d-sm-flex justify-content-between mt-lg-4 mb-4 pb-3 pb-sm-2 border-bottom">
                                     <div class="d-block d-sm-flex align-items-start text-center text-sm-start">
                                         <a class="d-block flex-shrink-0 mx-auto me-sm-4" href="#" style="width: 10rem;">
-                                            @if (count($product->getWishListProducts->product_images) > 0 )
-                                                <img src="{{ asset('uploads/products/small/'.$product->getWishListProducts->product_images[0]->image) }}" alt="Product">    
+                                            @if (count($product->getWishListProducts->product_images) > 0)
+                                                <img src="{{ asset('uploads/products/small/'.$product->getWishListProducts->product_images[0]->image) }}" alt="Product">
                                             @else
-                                                <img src="{{ asset('admin-assets/img/default-150x150.png') }}" alt="Product">    
+                                                <img src="{{ asset('admin-assets/img/default-150x150.png') }}" alt="Product">
                                             @endif
                                         </a>
                                         <div class="pt-2">
-                                            <h3 class="product-title fs-base mb-2"><a href="shop-single-v1.html">{{ $product->getWishListProducts->title }}</a></h3>                                        
-                                            <div class="fs-lg text-accent pt-2">${{ number_format($product->getWishListProducts->price, 2)  }}</div>
+                                            <h3 class="product-title fs-base mb-2">
+                                                <a href="shop-single-v1.html">{{ $product->getWishListProducts->title }}</a>
+                                            </h3>
+                                            <div class="fs-lg text-accent pt-2">
+                                                ${{ number_format($product->getWishListProducts->price, 2) }}
+                                            </div>
+                                            @if ($product->getWishListProducts->qty > 0)
+                                                <span class="badge bg-success mt-2">In Stock</span>
+                                            @else
+                                                <span class="badge bg-danger mt-2">Out of Stock</span>
+                                            @endif
                                         </div>
                                     </div>
                                     <div class="pt-2 ps-sm-3 mx-auto mx-sm-0 text-center">
-                                        <button class="btn btn-outline-danger btn-sm" onclick="deleteWishListProduct({{$product->product_id}})" type="button"><i class="fas fa-trash-alt me-2"></i>Remove</button>
+                                        <button class="btn btn-outline-danger btn-sm" onclick="deleteWishListProduct({{ $product->product_id }})" type="button"><i class="fas fa-trash-alt me-2"></i>Remove</button>
                                     </div>
-                                </div>        
+                                </div>
                             @endforeach
                         @else
                             <div class="mt-4">
-                                <h1 class="text-center" >Wish List Empty</h1>
+                                <h1 class="text-center">Wish List Empty</h1>
                             </div>
-                        @endif  
+                        @endif
                     </div>
                 </div>
             </div>

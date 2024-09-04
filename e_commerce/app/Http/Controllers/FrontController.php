@@ -20,6 +20,7 @@ class FrontController extends Controller
                                 ->with('product_images');
                                 
         
+
         $wishListProductId = [];
         if(Auth::check()){
             $wishListProducts = WishList::select('product_id')->where('user_id', Auth::user()->id)->get();
