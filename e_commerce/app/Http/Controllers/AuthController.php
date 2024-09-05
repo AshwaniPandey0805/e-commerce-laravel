@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Country;
+use App\Models\CustomerAddress;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\User;
@@ -84,8 +86,87 @@ class AuthController extends Controller
     }
 
     public function profile(){
-        
-        return view('front.account.profile');
+        $countries = Country::orderBy('name', 'ASC')->get();
+        $user = Auth::user();
+        $userAddress = CustomerAddress::where('user_id', $user->id)->first();
+        $data['user'] = $user;
+        $data['userAddress'] = $userAddress;
+        $data['countries'] = $countries;
+        // dd($user);
+        return view('front.account.profile', $data);
+    }
+
+    public function updateUserProfile($id ,Request $request){
+        // dd($request->all(), $id);
+        $user = User::find($id);
+        $validator = Validator::make($request->all(),[
+            'name' => 'required',
+            'email' => 'required|unique:users,email,'.$user->id.'id',
+            'phone' => 'required|unique:users,phone,'.$user->id.'id',
+        ]);
+        if($validator->passes()){
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->phone = $request->phone;
+            $user->save();
+            $request->session()->flash('success', 'User updated successfully');
+            return response()->json([
+                'status' => true,
+                'errors' => 'User Updated successfully'
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors()
+            ]);
+        }
+    }
+
+    public function updateUserAddress($id ,Request $request){
+        $validator = Validator::make($request->all(),[
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'email' => 'required|email',
+            'country_id' => 'required',
+            'address' => 'required',
+            'apartement' => 'required',
+            'city' => 'required',
+            'state' => 'required',
+            'zip_code' => 'required',
+            'mobile' => 'required',
+        ]);
+
+        if($validator->passes()){
+            CustomerAddress::updateOrCreate(
+                ['user_id' => $id],
+                [
+                    'user_id' => $id,
+                    'first_name' => $request->first_name,
+                    'last_name' => $request->last_name,
+                    'email' => $request->email,
+                    'mobile' => $request->mobile,
+                    'country_id' => $request->country_id,
+                    'address' => $request->address,
+                    'apartement' => $request->apartement,
+                    'city' => $request->city,
+                    'state' => $request->state,
+                    'zip_code' => $request->zip_code,
+                ]
+            );
+
+            $request->session()->flash('success', 'Address updated successfully');
+            return response()->json([
+                'status' => true,
+                'message' => 'User Address updated successfully'
+            ]);
+        } else {
+
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors(),
+                'message' => 'Something went wrong'
+            ]);
+        }
     }
 
     public function order(){
