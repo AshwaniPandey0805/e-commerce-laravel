@@ -109,53 +109,7 @@
 				});
 			});
 
-			// add to wish list script
-			function addToWishList(id){
-				console.log(id);
-				$.ajax({
-					url : "{{route('wishlist.store')}}",
-					type : 'POST',
-					data : { id : id },
-					dataType : 'json',
-					success : function ( response ){
-						console.log(response);
-					}, 
-					error : function ( error ){
-						console.log(error.message);
-					}
-				});
-			}
-
 		</script>
-			{{-- <script>
-				// add to wish list script
-					function addToWishList(id){
-						console.log(id);
-						$.ajax({
-							url : "{{route('account.wishlist.store')}}",
-							type : 'POST',
-							data : { id : id },
-							dataType : 'json',
-							success : function ( response ){
-								console.log(response['status']);
-
-								if(response['status'] == true){
-									console.log('sasaasa')
-									Swal.fire({
-										position: "top-end",
-										icon: "success",
-										title: `${response['product_name']} is added to wish list`,
-										showConfirmButton: false,
-										timer: 1500
-									});
-								}
-							}, 
-							error : function ( error ){
-								console.log(error.message);
-							}
-						});
-					}
-			</script> --}}
 
 		@yield('customeJS')
        

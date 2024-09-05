@@ -10,6 +10,7 @@ use App\Http\Controllers\admin\ProductController;
 use App\Http\Controllers\admin\ProductImageController;
 use App\Http\Controllers\admin\SubCategoryController;
 use App\Http\Controllers\admin\TemImageController;
+use App\Http\Controllers\admin\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\FrontController;
@@ -164,6 +165,13 @@ Route::group(['prefix' => 'admin'], function(){
         Route::get('/order/{id}/detail',[OrderController::class, 'detail'])->name('order.detail');
         Route::post('/order/{id}/update',[OrderController::class, 'update'])->name('order.update');
         Route::post('/order/{id}/send-invoice-mail',[OrderController::class, 'sendInvoiceMail'])->name('order.sendInvoiceMail');
+
+        // Users Routes
+        Route::get('/user/list',[UserController::class, 'index'])->name('user.index');
+        Route::get('/user/{id}/edit',[UserController::class, 'edit'])->name('user.edit');
+        Route::post('/user/{id}/update-detail',[UserController::class, 'userDetailUpdate'])->name('user.update');
+        Route::post('/user/{id}/update-address',[UserController::class, 'userAddressDetailUpdate'])->name('user.address.update');
+        Route::any('/user/{id}/delete',[UserController::class, 'delete'])->name('user.delete');
 
         // Get Sub Category data
         Route::post('/product/sub-category',[ProductSubCategoryController::class, 'getSubCategory'])->name('product.SubCategory');
