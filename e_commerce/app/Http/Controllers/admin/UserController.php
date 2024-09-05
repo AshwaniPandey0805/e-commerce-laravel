@@ -7,6 +7,7 @@ use App\Models\Country;
 use App\Models\CustomerAddress;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -16,6 +17,43 @@ class UserController extends Controller
         // dd($users);
         $data['users'] = $users;
         return view('admin.user.list', $data);
+    }
+
+    public function create(){
+        $countries = Country::orderBy('name', 'ASC')->get();
+        $data['countries'] = $countries;
+        return view('admin.user.create', $data);
+    }
+
+    public function store(Request $request){
+        $validator = Validator::make($request->all(),[
+            'name' => 'required',
+            'email' => 'required|unique:users',
+            'phone' => 'required|unique:users',
+            'password' => 'required',
+            'gender' => 'required',
+            'status' => 'required',
+        ]);
+        if($validator->passes()){
+            $user = new User();
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->phone = $request->phone;
+            $user->gender = $request->gender;
+            $user->status = $request->status;
+            $user->password = Hash::make($request->password);
+            $user->save();
+            $request->session()->flash('success', 'User Created successfully');
+            return response()->json([
+                'status' => true,
+                'message' => 'User Created successfully',
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors()
+            ]);
+        }
     }
 
     public function edit($id){
@@ -35,11 +73,15 @@ class UserController extends Controller
             'name' => 'required',
             'email' => 'required|unique:users,email,'.$user->id.'id',
             'phone' => 'required|unique:users,phone,'.$user->id.'id',
+            'status' => 'required',
+            'gender' => 'required',
         ]);
         if($validator->passes()){
             $user->name = $request->name;
             $user->email = $request->email;
             $user->phone = $request->phone;
+            $user->status = $request->status;
+            $user->gender = $request->gender;
             $user->save();
             $request->session()->flash('success', 'User updated successfully');
             return response()->json([

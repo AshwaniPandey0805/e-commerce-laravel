@@ -6,6 +6,7 @@ use App\Http\Controllers\admin\CategoryController;
 use App\Http\Controllers\admin\DiscountCouponController;
 use App\Http\Controllers\admin\HomeController;
 use App\Http\Controllers\admin\OrderController;
+use App\Http\Controllers\admin\PageController;
 use App\Http\Controllers\admin\ProductController;
 use App\Http\Controllers\admin\ProductImageController;
 use App\Http\Controllers\admin\SubCategoryController;
@@ -168,10 +169,21 @@ Route::group(['prefix' => 'admin'], function(){
 
         // Users Routes
         Route::get('/user/list',[UserController::class, 'index'])->name('user.index');
+        Route::get('/user/create',[UserController::class, 'create'])->name('user.create');
+        Route::post('/user/store',[UserController::class, 'store'])->name('user.store');
         Route::get('/user/{id}/edit',[UserController::class, 'edit'])->name('user.edit');
         Route::post('/user/{id}/update-detail',[UserController::class, 'userDetailUpdate'])->name('user.update');
         Route::post('/user/{id}/update-address',[UserController::class, 'userAddressDetailUpdate'])->name('user.address.update');
         Route::any('/user/{id}/delete',[UserController::class, 'delete'])->name('user.delete');
+
+
+        // Page Routes
+        Route::get('/page/list', [PageController::class, 'index'])->name('page.index');
+        Route::get('/page/create', [PageController::class, 'create'])->name('page.create');
+        Route::post('/page/store', [PageController::class, 'store'])->name('page.store');
+        Route::get('/page/{id}/edit', [PageController::class, 'edit'])->name('page.edit');
+        Route::post('/page/{id}/update', [PageController::class, 'update'])->name('page.update');
+        Route::any('/page/{id}/delete', [PageController::class, 'delete'])->name('page.delete');
 
         // Get Sub Category data
         Route::post('/product/sub-category',[ProductSubCategoryController::class, 'getSubCategory'])->name('product.SubCategory');

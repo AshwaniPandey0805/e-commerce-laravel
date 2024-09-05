@@ -35,116 +35,130 @@
     <section class="content">
         <!-- Default box -->
         <div class="container-fluid">
-            <div class="col-md-9">
-                <!-- Personal Information Card -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="h5 mb-0 pt-2 pb-2">Personal Information</h2>
-                    </div>
-                    <form action="" id="user_detail_form" name="user_detail_form">
-                        <div class="card-body p-4">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
+            <div class="row">
+                <div class="col-md-4" >
+                    <!-- Personal Information Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="h5 mb-0 pt-2 pb-2">Personal Information</h2>
+                        </div>
+                        <form action="" id="user_detail_form" name="user_detail_form">
+                            <div class="card-body p-4">
+                                <div class="col-md-12 mb-3">
                                     <label for="name">Name</label>
                                     <input type="text" name="name" id="name" value="{{ $user->name }}" placeholder="Enter Your Name" class="form-control">
                                 </div>
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-12 mb-3">
                                     <label for="email">Email</label>
                                     <input type="text" name="email" id="email" value="{{ $user->email }}" placeholder="Enter Your Email" class="form-control">
                                 </div>
-                            </div>
-    
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-12 mb-3">
                                     <label for="phone">Phone</label>
                                     <input type="text" name="phone" id="phone" value="{{ $user->phone }}" placeholder="Enter Your Phone" class="form-control">
                                 </div>
-                            </div>
-    
-                            <div class="d-flex">
-                                <button type="submit" class="btn btn-dark">Update</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-    
-                <!-- Address Information Card -->
-                @if (isset($userAddress))
-                    <div class="card mt-5">
-                        <div class="card-header">
-                            <h2 class="h5 mb-0 pt-2 pb-2">Address Information</h2>
-                        </div>
-                        <form action="" id="user_address_detail_form" name="user_address_detail_form">
-                            <div class="card-body p-4">
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="first_name">First Name</label>
-                                        <input type="text" name="first_name" id="first_name" value="{{ $userAddress->first_name }}" placeholder="Enter Your First Name" class="form-control">
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="last_name">Last Name</label>
-                                        <input type="text" name="last_name" id="last_name" value="{{ $userAddress->last_name }}" placeholder="Enter Your Last Name" class="form-control">
-                                    </div>
+                                <div class="col-md-12 mb-3">
+                                    <label for="gender">Gender</label>
+                                    <select name="gender" id="gender" class="form-control">
+                                        <option {{ ($user->gender == 'Male') ? 'selected' : '' }}  value="Male">Male</option>
+                                        <option {{ ($user->gender == 'Female') ? 'selected' : '' }}  value="Female">Female</option>
+                                        <option {{ ($user->gender == 'Other') ? 'selected' : '' }}  value="Other">Other</option>
+                                    </select>
+                                    <p></p>
                                 </div>
-        
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="email">Email</label>
-                                        <input type="text" name="email" id="email" value="{{ $userAddress->email }}" placeholder="Enter Your Email" class="form-control">
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="mobile">Mobile</label>
-                                        <input type="text" name="mobile" id="mobile" value="{{ $userAddress->mobile }}" placeholder="Enter Your Mobile Number" class="form-control">
-                                    </div>
+                                <div class="col-md-12 mb-3">
+                                    <label for="status">Status</label>
+                                    <select name="status" id="status" class="form-control" >
+                                        <option {{ ($user->status == 1) ? 'selected' : '' }}  value="1">Active</option>
+                                        <option {{ ($user->status == 0) ? 'selected' : '' }}  value="0">In-Active</option>
+                                    </select>
+                                    <p></p>
                                 </div>
-        
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="country_id">Country</label>
-                                        <select name="country_id" id="country_id" class="form-control">
-                                            @if (isset($countries))
-                                                @foreach ($countries as $country)
-                                                    <option {{ ($userAddress->country_id == $country->id) ? 'selected' : '' }} value="{{ $country->id }}">{{ $country->name }}</option>
-                                                @endforeach
-                                            @endif
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="zip_code">Zip Code</label>
-                                        <input type="text" name="zip_code" id="zip_code" value="{{ $userAddress->zip_code }}" placeholder="Enter Zip Code" class="form-control">
-                                    </div>
-                                </div>
-        
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="city">City</label>
-                                        <input type="text" name="city" id="city" value="{{ $userAddress->city }}" placeholder="Enter Your City" class="form-control">
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="state">State</label>
-                                        <input type="text" name="state" id="state" value="{{ $userAddress->state }}" placeholder="Enter State" class="form-control">
-                                    </div>
-                                </div>
-        
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="apartement">Apartment</label>
-                                        <input type="text" name="apartement" id="apartement" value="{{ $userAddress->apartement }}" placeholder="Enter Your Apartment Number" class="form-control">
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="address">Address</label>
-                                        <textarea name="address" id="address" cols="30" rows="3" placeholder="Enter Address" class="form-control">{{ $userAddress->address }}</textarea>
-                                    </div>
-                                </div>
-        
-                                <div class="d-flex">
+                                <div class="d-flex justify-content-center align-content-center pt-3">
                                     <button type="submit" class="btn btn-dark">Update</button>
                                 </div>
                             </div>
                         </form>
                     </div>
                 </div>
-                @endif
+                <div class="col-md-8">
+                    <!-- Address Information Card -->
+                    @if (isset($userAddress))
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="h5 mb-0 pt-2 pb-2">Address Information</h2>
+                            </div>
+                            <form action="" id="user_address_detail_form" name="user_address_detail_form">
+                                <div class="card-body p-4">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="first_name">First Name</label>
+                                            <input type="text" name="first_name" id="first_name" value="{{ $userAddress->first_name }}" placeholder="Enter Your First Name" class="form-control">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="last_name">Last Name</label>
+                                            <input type="text" name="last_name" id="last_name" value="{{ $userAddress->last_name }}" placeholder="Enter Your Last Name" class="form-control">
+                                        </div>
+                                    </div>
+            
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="email">Email</label>
+                                            <input type="text" name="email" id="email" value="{{ $userAddress->email }}" placeholder="Enter Your Email" class="form-control">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="mobile">Mobile</label>
+                                            <input type="text" name="mobile" id="mobile" value="{{ $userAddress->mobile }}" placeholder="Enter Your Mobile Number" class="form-control">
+                                        </div>
+                                    </div>
+            
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="country_id">Country</label>
+                                            <select name="country_id" id="country_id" class="form-control">
+                                                @if (isset($countries))
+                                                    @foreach ($countries as $country)
+                                                        <option {{ ($userAddress->country_id == $country->id) ? 'selected' : '' }} value="{{ $country->id }}">{{ $country->name }}</option>
+                                                    @endforeach
+                                                @endif
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="zip_code">Zip Code</label>
+                                            <input type="text" name="zip_code" id="zip_code" value="{{ $userAddress->zip_code }}" placeholder="Enter Zip Code" class="form-control">
+                                        </div>
+                                    </div>
+            
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="city">City</label>
+                                            <input type="text" name="city" id="city" value="{{ $userAddress->city }}" placeholder="Enter Your City" class="form-control">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="state">State</label>
+                                            <input type="text" name="state" id="state" value="{{ $userAddress->state }}" placeholder="Enter State" class="form-control">
+                                        </div>
+                                    </div>
+            
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="address">Address</label>
+                                            <textarea name="address" id="address" cols="30" rows="3" placeholder="Enter Address" class="form-control">{{ $userAddress->address }}</textarea>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="apartement">Apartment</label>
+                                            <input type="text" name="apartement" id="apartement" value="{{ $userAddress->apartement }}" placeholder="Enter Your Apartment Number" class="form-control">
+                                        </div>
+                                    </div>
+            
+                                    <div class="d-flex justify-content-end">
+                                        <button type="submit" class="btn btn-dark">Update</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    @endif
+                </div>
+            </div>
         </div>
         <!-- /.card -->
     </section>
